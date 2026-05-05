@@ -127,6 +127,7 @@ body {
     text-decoration: none;
     transition: color 0.3s;
     white-space: nowrap;
+    margin: 8px 0 8px 0;
 }
 .header-logo .logo-icon {
     width: 34px;
@@ -151,6 +152,7 @@ body {
     align-items: center;
     gap: 0.6rem;
     flex-wrap: wrap;
+    margin: 8px 0 8px 0;
 }
 
 /* ========== BUTTONS & CONTROLS ========== */
@@ -800,7 +802,7 @@ input:checked + .toggle-slider::before {
     .header-search {
         order: 3;
         width: 100%;
-        margin: 0;
+        margin: 8px 0 8px 0;
     }
     .search-input {
         min-width: auto;
@@ -846,6 +848,7 @@ input:checked + .toggle-slider::before {
     .header-controls {
         width: 100%;
         justify-content: space-between;
+        margin: 8px 0 8px 0;
     }
     /* Убираем текстовые подписи у тумблеров, оставляем только иконки */
     .toggle-group span {
