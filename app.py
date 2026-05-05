@@ -1,7 +1,7 @@
 import json
 import re
 from pathlib import Path
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, send_from_directory
 import os
 
 app = Flask(__name__)
@@ -99,11 +99,14 @@ def api_ticket(ticket_id):
         return jsonify(ticket)
     return jsonify({"error": "Билет не найден"}), 404
 
-# if __name__ == '__main__':
-#     print(f"✅ Загружено билетов: {len(TICKETS)}")
-#     print(f"✅ Всего вопросов: {sum(len(t['questions']) for t in TICKETS)}")
-#     print("🚀 Сервер запущен: http://127.0.0.1:52026")
-#     app.run(debug=True, host='0.0.0.0', port=52026)
+@app.route('/sw.js')
+def service_worker():
+    """Отдаём Service Worker из корня проекта с правильными заголовками"""
+    response = send_from_directory('.', 'sw.js')
+    response.headers['Service-Worker-Allowed'] = '/'
+    response.headers['Content-Type'] = 'application/javascript'
+    return response
+    
 if __name__ == '__main__':
     print(f"✅ Загружено билетов: {len(TICKETS)}")
     print(f"✅ Всего вопросов: {sum(len(t['questions']) for t in TICKETS)}")
