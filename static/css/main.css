@@ -457,7 +457,7 @@ input:checked + .toggle-slider::before {
     border-color: var(--accent);
 }
 .question-card .q-number {
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.06em;
@@ -553,6 +553,16 @@ input:checked + .toggle-slider::before {
 }
 .pulse-anim {
     animation: pulse 0.4s ease;
+}
+/* Иконка поиска – крестик для сброса */
+.search-icon.clear {
+    color: var(--accent);
+    cursor: pointer;
+    pointer-events: auto;
+    transition: color 0.2s;
+}
+.search-icon.clear:hover {
+    color: var(--accent-hover);
 }
 
 /* ========== SEARCH DROPDOWN ========== */
@@ -936,6 +946,11 @@ input:checked + .toggle-slider::before {
     margin: 0 6px;
 }
 
+/* Скрытие тумблера без смещения */
+.toggle-group.hidden-placeholder {
+    visibility: hidden;
+    pointer-events: none;
+}
 /* Интерактивные карточки статистики */
 .stat {
     cursor: pointer;
