@@ -76,19 +76,12 @@
 
         <!-- Верхний блок управления тестом (перед вопросами) -->
         <div class="test-controls test-controls-top" id="testControlsTop" style="display: none;">
-            <!-- <button class="btn btn-sm" id="prevQuestionBtn">
-                <i class="fa-solid fa-chevron-left"></i> Предыдущий вопрос
-            </button>
-            <span class="test-progress" id="questionProgress">1 / 10</span>
-            <button class="btn btn-sm" id="nextQuestionBtn">
-                Следующий вопрос <i class="fa-solid fa-chevron-right"></i>
-            </button> -->
             <button class="btn btn-sm" id="nextTicketBtn" title="Случайный билет">
                 <i class="fa-solid fa-shuffle"></i> Случайный билет
             </button>
             <span class="test-progress" id="questionProgress">1 / 10</span>
             <button class="btn btn-sm btn-accent" id="finishTestBtn">
-                <i class="fa-solid fa-flag-checkered"></i> Завершить / результаты
+                <i class="fa-solid fa-flag-checkered"></i> Завершить / Результаты
             </button>
         </div>
 
@@ -97,12 +90,6 @@
 
         <!-- Нижний блок управления тестом (после вопросов) -->
         <div class="test-controls test-controls-bottom" id="testControlsBottom" style="display: none;">
-            <!-- <button class="btn btn-sm" id="nextTicketBtn" title="Случайный билет">
-                <i class="fa-solid fa-shuffle"></i> Случайный билет
-            </button>
-            <button class="btn btn-sm btn-accent" id="finishTestBtn">
-                <i class="fa-solid fa-flag-checkered"></i> Завершить и посмотреть результаты
-            </button> -->
             <button class="btn btn-sm" id="prevQuestionBtn">
                 <i class="fa-solid fa-chevron-left"></i> Предыдущий вопрос
             </button>
@@ -110,6 +97,11 @@
             <button class="btn btn-sm" id="nextQuestionBtn">
                 Следующий вопрос <i class="fa-solid fa-chevron-right"></i>
             </button>
+            <!-- НОВАЯ КНОПКА -->
+            <button class="btn btn-sm btn-accent" id="finishTestBtnBottom" style="display:none;">
+                <i class="fa-solid fa-flag-checkered"></i> Завершить / Результаты
+            </button>
+            <!-- конец новой кнопки -->
         </div>
 
         <!-- Результаты теста (скрыт изначально) -->
