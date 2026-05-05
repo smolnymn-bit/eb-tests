@@ -277,6 +277,8 @@
             // Всегда начинаем новый тест при включении переключателя
             const randomIdx = Math.floor(Math.random() * TICKETS_DATA.length);
             startTest(randomIdx);
+            const correctOnlyGroup = correctOnlyToggle.closest('.toggle-group');
+            if (correctOnlyGroup) correctOnlyGroup.style.display = 'none';
         } else {
             // Возврат к обычному режиму просмотра
             // testControls.style.display = 'none';
@@ -286,6 +288,8 @@
             questionsList.style.display = '';
             ticketPagination.style.display = '';
             correctOnlyToggle.disabled = false;
+            const correctOnlyGroup = correctOnlyToggle.closest('.toggle-group');
+            if (correctOnlyGroup) correctOnlyGroup.style.display = '';
             renderTicket(currentTicketIndex, searchQuery);
         }
     }
