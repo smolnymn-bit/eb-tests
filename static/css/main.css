@@ -1,5 +1,5 @@
 :root {
-    --bg: #e6e6e6c4;
+    --bg: #ffffff;
     --bg-secondary: #f5f7fa;
     --text: #1a1a2e;
     --text-secondary: #4a5568;
@@ -32,8 +32,8 @@
     --bg: #0f172a;
     --bg-secondary: #1e293b;
     --text: #e2e8f0;
-    --text-secondary: #94a3b8;
-    --accent: #38bdf8;
+    --text-secondary: #bed9ff;
+    --accent: #0096d6; /*#38bdf8;*/
     --accent-hover: #7dd3fc;
     --accent-light: #0c2d48;
     --card-bg: #1e293b;
@@ -127,7 +127,6 @@ body {
     text-decoration: none;
     transition: color 0.3s;
     white-space: nowrap;
-    margin: 8px 0 8px 0;
 }
 .header-logo .logo-icon {
     width: 34px;
@@ -152,7 +151,6 @@ body {
     align-items: center;
     gap: 0.6rem;
     flex-wrap: wrap;
-    margin: 8px 0 8px 0;
 }
 
 /* ========== BUTTONS & CONTROLS ========== */
@@ -172,6 +170,7 @@ body {
     white-space: nowrap;
     font-family: inherit;
     text-decoration: none;
+    justify-content: center;
 }
 .btn:hover {
     background: var(--bg-secondary);
@@ -199,56 +198,6 @@ body {
     border-radius: 6px;
 }
 
-/* Toggle Switch */
-/*.toggle-group {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    font-weight: 500;
-    white-space: nowrap;
-}
-.toggle-switch {
-    position: relative;
-    width: 40px;
-    height: 22px;
-    flex-shrink: 0;
-}
-.toggle-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-.toggle-slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: var(--toggle-bg);
-    transition: 0.3s;
-    border-radius: 22px;
-}
-.toggle-slider::before {
-    content: '';
-    position: absolute;
-    height: 16px;
-    width: 16px;
-    left: 3px;
-    bottom: 3px;
-    background: #fff;
-    transition: 0.3s;
-    border-radius: 50%;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-input:checked+.toggle-slider {
-    background: var(--toggle-active);
-}
-input:checked+.toggle-slider::before {
-    transform: translateX(18px);
-}*/
 /* Toggle Switch */
 .toggle-group {
     display: flex;
@@ -314,7 +263,6 @@ input:checked + .toggle-slider::before {
 /* ========== SEARCH BAR ========== */
 .search-wrapper {
     position: relative;
-    margin: 8px 0 8px 0;
 }
 .search-input {
     min-width: 300px;
@@ -396,7 +344,7 @@ input:checked + .toggle-slider::before {
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%234a5568'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 0.7rem center;
-    min-width: 140px;
+    min-width: 85px;
 }
 .ticket-select:focus {
     border-color: var(--accent);
@@ -632,24 +580,6 @@ input:checked + .toggle-slider::before {
 }
 
 /* ========== ТЕСТОВЫЙ РЕЖИМ ========== */
-/*.test-controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    margin-bottom: 1.5rem;
-    padding: 0.75rem;
-    background: var(--bg-secondary);
-    border-radius: 12px;
-    flex-wrap: wrap;
-}
-.test-progress {
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: var(--accent);
-    min-width: 60px;
-    text-align: center;
-}*/
 .test-controls {
     display: flex;
     align-items: center;
@@ -969,4 +899,26 @@ input:checked + .toggle-slider::before {
     .test-progress {
         font-size: 0.8rem;
     }
+}
+
+.test-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.test-controls .btn {
+    flex: 1 1 0;               /* кнопки делят доступное пространство поровну */
+    min-width: 0;              /* чтобы текст мог переноситься */
+    white-space: normal;
+    text-align: center;
+}
+
+/* Прогресс-бар между кнопками не должен сжиматься */
+.test-controls .test-progress {
+    flex: 0 0 auto;
+    white-space: nowrap;
+    margin: 0 6px;
 }
