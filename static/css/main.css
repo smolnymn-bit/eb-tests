@@ -273,7 +273,7 @@ input:checked + .toggle-slider::before {
     border: 2px solid var(--input-border);
     background: var(--input-bg);
     color: var(--text);
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     font-family: inherit;
     transition: all 0.3s ease;
     outline: none;
