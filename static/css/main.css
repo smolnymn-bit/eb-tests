@@ -127,6 +127,7 @@ body {
     text-decoration: none;
     transition: color 0.3s;
     white-space: nowrap;
+    margin: 8px 0 8px 0;
 }
 .header-logo .logo-icon {
     width: 34px;
@@ -151,6 +152,7 @@ body {
     align-items: center;
     gap: 0.6rem;
     flex-wrap: wrap;
+    margin: 8px 0 8px 0;
 }
 
 /* ========== BUTTONS & CONTROLS ========== */
@@ -312,6 +314,7 @@ input:checked + .toggle-slider::before {
 /* ========== SEARCH BAR ========== */
 .search-wrapper {
     position: relative;
+    margin: 8px 0 8px 0;
 }
 .search-input {
     min-width: 300px;
