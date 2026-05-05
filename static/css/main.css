@@ -209,6 +209,10 @@ body {
     color: var(--text-secondary);
     font-weight: 500;
     white-space: nowrap;
+    border: solid 1px;
+    border-color: var(--badge-bg);
+    border-radius: 25px;
+    padding: 8px;
 }
 .toggle-switch {
     position: relative;
@@ -273,7 +277,7 @@ input:checked + .toggle-slider::before {
     border: 2px solid var(--input-border);
     background: var(--input-bg);
     color: var(--text);
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     font-family: inherit;
     transition: all 0.3s ease;
     outline: none;
@@ -756,7 +760,6 @@ input:checked + .toggle-slider::before {
     background: #ef4444;
     color: white;
 }
-
 .results-actions {
     display: grid;
     gap: 1rem;
@@ -764,7 +767,12 @@ input:checked + .toggle-slider::before {
     margin-top: 2rem;
     justify-content: center;
 }
-
+.green-fa {
+    background: #1bc662;
+    color: white;
+    padding: 1px 4px;
+    border-radius: 50%;
+}
 /* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
     .header {
