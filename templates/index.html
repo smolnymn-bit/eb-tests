@@ -7,12 +7,6 @@
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.all.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
-    <link rel="manifest" href="/static/manifest.json">
-    <meta name="theme-color" content="#0096d6">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="ЭБ Тесты">
-    <link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
 </head>
 <body data-theme="light">
 
@@ -80,26 +74,30 @@
             <span class="ticket-badge" id="questionCount">10 вопросов</span>
         </div>
 
-        <!-- НОВЫЙ БЛОК: управление тестом (виден только в режиме теста) -->
-        <div class="test-controls" id="testControls" style="display: none;">
-            <button class="btn btn-sm" id="prevQuestionBtn" title="Предыдущий вопрос">
-                <i class="fa-solid fa-chevron-left"></i> Назад
+        <!-- Верхний блок управления тестом (перед вопросами) -->
+        <div class="test-controls test-controls-top" id="testControlsTop" style="display: none;">
+            <button class="btn btn-sm" id="prevQuestionBtn">
+                <i class="fa-solid fa-chevron-left"></i> Предыдущий вопрос
             </button>
             <span class="test-progress" id="questionProgress">1 / 10</span>
-            <button class="btn btn-sm" id="nextQuestionBtn" title="Следующий вопрос">
-                Вперед <i class="fa-solid fa-chevron-right"></i>
-            </button>
-            <button class="btn btn-sm btn-accent" id="finishTestBtn">
-                <i class="fa-solid fa-flag-checkered"></i> Завершить
-            </button>
-            <button class="btn btn-sm" id="nextTicketBtn" title="Случайный билет">
-                <i class="fa-solid fa-shuffle"></i> Далее
+            <button class="btn btn-sm" id="nextQuestionBtn">
+                Следующий вопрос <i class="fa-solid fa-chevron-right"></i>
             </button>
         </div>
-        
+
         <!-- Questions -->
         <div class="questions-list" id="questionsList"></div>
-              
+
+        <!-- Нижний блок управления тестом (после вопросов) -->
+        <div class="test-controls test-controls-bottom" id="testControlsBottom" style="display: none;">
+            <button class="btn btn-sm" id="nextTicketBtn" title="Случайный билет">
+                <i class="fa-solid fa-shuffle"></i> Случайный билет
+            </button>
+            <button class="btn btn-sm btn-accent" id="finishTestBtn">
+                <i class="fa-solid fa-flag-checkered"></i> Завершить и посмотреть результаты
+            </button>
+        </div>
+
         <!-- Результаты теста (скрыт изначально) -->
         <div class="test-results" id="testResults" style="display: none;"></div>
 
@@ -116,18 +114,6 @@
     window.TICKETS_DATA = {{ tickets_json|safe }};
 </script>
 <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-      navigator.serviceWorker.register('/sw.js')
-        .then(function(reg) {
-          console.log('SW зарегистрирован:', reg.scope);
-        })
-        .catch(function(err) {
-          console.warn('Ошибка регистрации SW:', err);
-        });
-    });
-  }
-</script>
+
 </body>
 </html>
