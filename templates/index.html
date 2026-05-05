@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ЭБ 1256.19. Тесты Ростехнадзора по электробезопасности 3 группа до 1000 В  | Подготовка к экзамену</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.all.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#0096d6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="ЭБ Тесты">
+    <link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
+</head>
+<body data-theme="light">
+
+    <!-- ========== HEADER ========== -->
+    <header class="header">
+        <a href="/" class="header-logo" title="На главную">
+            <div class="logo-icon"><i class="fa-solid fa-bolt"></i></div>
+            <span>ЭБ 1256.19. Тесты РТН 3 группа</span>
+        </a>
+        <div class="search-wrapper header-search" id="searchWrapper">
+            <span class="search-icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+            <input type="text" class="search-input" id="searchInput"
+                   placeholder="Поиск по всем вопросам и ответам... (например: заземление, наряд-допуск, группа)">
+            <span class="search-results-badge" id="searchBadge"></span>
+            <div class="search-results-dropdown" id="searchDropdown"></div>
+        </div>
+        <div class="header-controls">
+            <!-- Темы -->
+            <div class="toggle-group">
+                <span><i class="fa-solid fa-sun"></i></span>
+                <label class="toggle-switch" title="Переключить тему">
+                    <input type="checkbox" id="themeToggle">
+                    <span class="toggle-slider"></span>
+                </label>
+                <span><i class="fa-solid fa-moon"></i></span>
+            </div>
+            <!-- Только правильные -->
+            <div class="toggle-group">
+                <span>Все</span>
+                <label class="toggle-switch" title="Показать только правильные ответы">
+                    <input type="checkbox" id="correctOnlyToggle">
+                    <span class="toggle-slider"></span>
+                </label>
+                <div class="green-fa">
+                    <span><i class="fa-solid fa-check"></i></span>
+                </div>
+            </div>
+            <!-- НОВЫЙ ПЕРЕКЛЮЧАТЕЛЬ: Режим теста -->
+            <div class="toggle-group">
+                <span>Учить</span>
+                <label class="toggle-switch" title="Режим теста">
+                    <input type="checkbox" id="testModeToggle">
+                    <span class="toggle-slider"></span>
+                </label>
+                <span>Тест</span>
+            </div>
+            <button class="btn btn-sm" id="resetSearchBtn" title="Сбросить поиск" style="display:none;">
+                <i class="fa-solid fa-times"></i> Сброс
+            </button>
+        </div>
+    </header>
+
+    <!-- ========== MAIN CONTENT ========== -->
+    <main class="main-container">
+        <!-- Ticket Navigation -->
+        <div class="ticket-nav">
+            <span class="nav-label">Билет</span>
+            <select class="ticket-select" id="ticketSelect"></select>
+            <div class="ticket-pagination" id="ticketPagination"></div>
+        </div>
+
+        <!-- Ticket Header -->
+        <div class="ticket-header">
+            <h2 class="ticket-title" id="ticketTitle">Билет 1</h2>
+            <span class="ticket-badge" id="questionCount">10 вопросов</span>
+        </div>
+
+        <!-- НОВЫЙ БЛОК: управление тестом (виден только в режиме теста) -->
+        <div class="test-controls" id="testControls" style="display: none;">
+            <button class="btn btn-sm" id="prevQuestionBtn" title="Предыдущий вопрос">
+                <i class="fa-solid fa-chevron-left"></i> Назад
+            </button>
+            <span class="test-progress" id="questionProgress">1 / 10</span>
+            <button class="btn btn-sm" id="nextQuestionBtn" title="Следующий вопрос">
+                Вперед <i class="fa-solid fa-chevron-right"></i>
+            </button>
+            <button class="btn btn-sm btn-accent" id="finishTestBtn">
+                <i class="fa-solid fa-flag-checkered"></i> Завершить
+            </button>
+            <button class="btn btn-sm" id="nextTicketBtn" title="Случайный билет">
+                <i class="fa-solid fa-shuffle"></i> Далее
+            </button>
+        </div>
+
+        <!-- Questions -->
+        <div class="questions-list" id="questionsList"></div>
+
+        <!-- Результаты теста (скрыт изначально) -->
+        <div class="test-results" id="testResults" style="display: none;"></div>
+
+        <!-- Empty state for search -->
+        <div class="empty-state" id="emptyState" style="display:none;">
+            <div class="empty-icon">📭</div>
+            <p>Ничего не найдено</p>
+            <small>Попробуйте изменить поисковый запрос</small>
+        </div>
+    </main>
+
+<script>
+    // Передача данных из Flask в JavaScript
+    window.TICKETS_DATA = {{ tickets_json|safe }};
+</script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/static/sw.js')
+        .then(function(reg) {
+          console.log('SW зарегистрирован:', reg.scope);
+        })
+        .catch(function(err) {
+          console.warn('Ошибка регистрации SW:', err);
+        });
+    });
+  }
+</script>
+</body>
+</html>
