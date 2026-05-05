@@ -20,7 +20,7 @@
     const searchInput = $('#searchInput');
     const searchDropdown = $('#searchDropdown');
     const searchBadge = $('#searchBadge');
-    const resetSearchBtn = $('#resetSearchBtn');
+    const searchIcon = $('#searchIcon');
     const ticketSelect = $('#ticketSelect');
     const ticketPagination = $('#ticketPagination');
     const ticketTitle = $('#ticketTitle');
@@ -143,7 +143,7 @@
         currentTicketIndex = ticketIndex;
 
         const ticket = TICKETS_DATA[ticketIndex];
-        ticketTitle.textContent = `№ ${ticket.id}`;
+        ticketTitle.textContent = `Билет № ${ticket.id}`;
         questionCount.textContent = `${ticket.questions.length} вопросов`;
 
         ticketSelect.value = ticketIndex;
@@ -159,7 +159,8 @@
         });
 
         renderPagination(ticketIndex);
-        updateSearchBadge();
+        // updateSearchBadge();
+        updateSearchIcon();
     }
 
     function renderPagination(activeIndex) {
@@ -234,7 +235,8 @@
         currentTicketIndex = index;
         searchInput.value = searchTerm;
         searchQuery = searchTerm;
-        resetSearchBtn.style.display = searchTerm.length >= 2 ? '' : 'none';
+        // resetSearchBtn.style.display = searchTerm.length >= 2 ? '' : 'none';
+        updateSearchIcon();
         hideDropdown();
         renderTicket(index, searchTerm);
         window.location.hash = `ticket-${TICKETS_DATA[index].id}`;
@@ -243,14 +245,34 @@
         ticketTitle.classList.add('pulse-anim');
     }
 
-    function updateSearchBadge() {
-        if (searchQuery.length >= 2) {
-            searchBadge.style.display = 'inline';
-            searchBadge.textContent = `«${searchQuery}»`;
+    function updateSearchIcon() {
+        const hasText = searchInput.value.trim().length > 0;
+        const iconElement = searchIcon.querySelector('i');
+        if (hasText) {
+            // Меняем на крестик
+            iconElement.className = 'fa-solid fa-times';
+            searchIcon.classList.add('clear');
         } else {
-            searchBadge.style.display = 'none';
+            // Меняем на лупу
+            iconElement.className = 'fa-solid fa-magnifying-glass';
+            searchIcon.classList.remove('clear');
         }
     }
+
+    // Клик по иконке поиска (крестик) – сброс
+    searchIcon.addEventListener('click', () => {
+        if (searchInput.value.trim().length > 0) {
+            searchInput.value = '';
+            searchQuery = '';
+            hideDropdown();
+            // Возврат к обычному отображению билета
+            if (!testMode) {
+                renderTicket(currentTicketIndex, '');
+            }
+            updateSearchIcon();
+            searchInput.focus();
+        }
+    });
 
     function populateTicketSelect() {
         ticketSelect.innerHTML = '';
@@ -278,10 +300,9 @@
             const randomIdx = Math.floor(Math.random() * TICKETS_DATA.length);
             startTest(randomIdx);
             const correctOnlyGroup = correctOnlyToggle.closest('.toggle-group');
-            if (correctOnlyGroup) correctOnlyGroup.style.display = 'none';
+            if (correctOnlyGroup) correctOnlyGroup.classList.add('hidden-placeholder');
         } else {
             // Возврат к обычному режиму просмотра
-            // testControls.style.display = 'none';
             testControlsTop.style.display = 'none';
             testControlsBottom.style.display = 'none';
             testResults.style.display = 'none';
@@ -289,7 +310,7 @@
             ticketPagination.style.display = '';
             correctOnlyToggle.disabled = false;
             const correctOnlyGroup = correctOnlyToggle.closest('.toggle-group');
-            if (correctOnlyGroup) correctOnlyGroup.style.display = '';
+            if (correctOnlyGroup) correctOnlyGroup.classList.remove('hidden-placeholder');
             renderTicket(currentTicketIndex, searchQuery);
         }
     }
@@ -310,13 +331,11 @@
         correctOnlyToggle.disabled = true;
 
         const ticket = TICKETS_DATA[testTicketIndex];
-        ticketTitle.textContent = `Билет ${ticket.id} (тест)`;
+        ticketTitle.textContent = `Билет № ${ticket.id} (тест)`;
         questionCount.textContent = `${ticket.questions.length} вопросов`;
 
         renderTestQuestion();
     }
-
-    // Удалите функцию switchToTestView() если она осталась – она больше не нужна
 
     function renderTestQuestion() {
         const ticket = TICKETS_DATA[testTicketIndex];
@@ -527,22 +546,19 @@
         localStorage.setItem('eb-theme', dark ? 'dark' : 'light');
     }
 
-    // ========== SEARCH EVENTS ==========
     searchInput.addEventListener('input', () => {
         const query = searchInput.value.trim();
         searchQuery = query;
         if (query.length >= 2) {
             const results = performGlobalSearch(query);
             showDropdown(results);
-            resetSearchBtn.style.display = '';
         } else {
             hideDropdown();
-            resetSearchBtn.style.display = 'none';
             if (!testMode) {
                 renderTicket(currentTicketIndex, '');
             }
         }
-        updateSearchBadge();
+        updateSearchIcon();
     });
 
     searchInput.addEventListener('focus', () => {
@@ -575,23 +591,12 @@
             searchInput.value = '';
             searchQuery = '';
             hideDropdown();
-            resetSearchBtn.style.display = 'none';
             if (!testMode) {
                 renderTicket(currentTicketIndex, '');
             }
             searchInput.blur();
+            updateSearchIcon();
         }
-    });
-
-    resetSearchBtn.addEventListener('click', () => {
-        searchInput.value = '';
-        searchQuery = '';
-        hideDropdown();
-        resetSearchBtn.style.display = 'none';
-        if (!testMode) {
-            renderTicket(currentTicketIndex, '');
-        }
-        searchInput.focus();
     });
 
     // ========== OTHER TOGGLES ==========
