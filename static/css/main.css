@@ -1,5 +1,5 @@
 :root {
-    --bg: #f5f5f5;
+    --bg: #ffffff;
     --bg-secondary: #f5f7fa;
     --text: #1a1a2e;
     --text-secondary: #4a5568;
@@ -273,7 +273,7 @@ input:checked + .toggle-slider::before {
     border: 2px solid var(--input-border);
     background: var(--input-bg);
     color: var(--text);
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     font-family: inherit;
     transition: all 0.3s ease;
     outline: none;
@@ -756,11 +756,13 @@ input:checked + .toggle-slider::before {
     background: #ef4444;
     color: white;
 }
+
 .results-actions {
-    display: flex;
-    justify-content: center;
+    display: grid;
     gap: 1rem;
+    grid-template-columns: 1fr 1fr 1fr;
     margin-top: 2rem;
+    justify-content: center;
 }
 
 /* ========== RESPONSIVE ========== */
@@ -924,4 +926,32 @@ input:checked + .toggle-slider::before {
     flex: 0 0 auto;
     white-space: nowrap;
     margin: 0 6px;
+}
+
+/* Интерактивные карточки статистики */
+.stat {
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 2px solid transparent;
+}
+.stat.active {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0, 150, 214, 0.2);
+}
+
+/* Отключённые кнопки */
+.btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+    pointer-events: none;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Верхняя панель теста с одной кнопкой */
+.test-controls.single-btn {
+    justify-content: center;
+}
+.test-controls.single-btn #nextTicketBtn {
+    flex: 1 1 auto;          /* занимает всю доступную ширину */
 }
