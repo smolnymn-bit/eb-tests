@@ -37,6 +37,7 @@
     const prevQuestionBtn = $('#prevQuestionBtn');
     const nextQuestionBtn = $('#nextQuestionBtn');
     const finishTestBtn = $('#finishTestBtn');
+    const finishTestBtnBottom = $('#finishTestBtnBottom');  // новая
     const nextTicketBtn = $('#nextTicketBtn');
     const questionProgress = $('#questionProgress');
 
@@ -359,6 +360,26 @@
         // Управление кнопками
         prevQuestionBtn.disabled = testQuestionIndex === 0;
         nextQuestionBtn.disabled = testQuestionIndex === ticket.questions.length - 1;
+
+        // Верхняя панель: показываем «Завершить» только после первого ответа
+        const anyAnswered = testAnswers.some(a => a !== null);
+        finishTestBtn.style.display = anyAnswered ? 'inline-flex' : 'none';
+        // Когда «Завершить» скрыт, прогресс тоже прячем, а кнопка «Случайный билет» растягивается
+        questionProgress.style.display = anyAnswered ? '' : 'none';
+        // Настройка растяжения кнопки «Случайный билет» делается через CSS-класс
+        testControlsTop.classList.toggle('single-btn', !anyAnswered);
+
+        // Нижняя кнопка «Завершить» вместо «Следующий вопрос» на последнем вопросе при всех ответах
+        const isLast = testQuestionIndex === ticket.questions.length - 1;
+        const allAnswered = testAnswers.every(a => a !== null);
+
+        if (isLast && allAnswered) {
+            nextQuestionBtn.style.display = 'none';
+            finishTestBtnBottom.style.display = 'inline-flex';
+        } else {
+            nextQuestionBtn.style.display = 'inline-flex';
+            finishTestBtnBottom.style.display = 'none';
+        }
     }
 
     function handleTestOptionClick(e) {
@@ -391,7 +412,6 @@
 
         // Скрываем вопросы и показываем результаты
         questionsList.style.display = 'none';
-        // testControls.style.display = 'none';
         testControlsTop.style.display = 'none';
         testControlsBottom.style.display = 'none';
         testResults.style.display = 'block';
@@ -400,9 +420,9 @@
             <div class="results-card">
                 <h2 class="results-title">Результаты теста — Билет ${ticket.id}</h2>
                 <div class="results-stats">
-                    <div class="stat correct"><span class="stat-num">${correctCount}</span> правильно</div>
-                    <div class="stat wrong"><span class="stat-num">${wrongCount}</span> неправильно</div>
-                    <div class="stat unanswered"><span class="stat-num">${unansweredCount}</span> без ответа</div>
+                    <div class="stat correct" data-category="correct"><span class="stat-num">${correctCount}</span> правильно</div>
+                    <div class="stat wrong" data-category="wrong"><span class="stat-num">${wrongCount}</span> неправильно</div>
+                    <div class="stat unanswered" data-category="unanswered"><span class="stat-num">${unansweredCount}</span> без ответа</div>
                 </div>
                 <div class="results-details">
                     <h3>Детализация:</h3>
@@ -415,7 +435,7 @@
                             statusText = ans.correct ? 'Правильно' : 'Неправильно';
                         }
                         return `
-                            <div class="result-question">
+                            <div class="result-question" data-status="${statusClass}">
                                 <div class="result-status ${statusClass}">${statusText}</div>
                                 <div class="result-qtext">${q.text}</div>
                                 <ul class="result-options">
@@ -435,6 +455,7 @@
                 </div>
                 <div class="results-actions">
                     <button class="btn btn-accent" id="retryTestBtn">Пройти заново</button>
+                    <button class="btn" id="newTicketBtnResult"><i class="fa-solid fa-shuffle"></i> Новый билет</button>
                     <button class="btn" id="exitTestBtn">Выйти из теста</button>
                 </div>
             </div>
@@ -442,13 +463,47 @@
 
         testResults.innerHTML = resultHTML;
 
-        // Обработчики для кнопок в результатах
-        $('#retryTestBtn').addEventListener('click', () => {
+        // Обработчики кнопок
+        document.getElementById('retryTestBtn').addEventListener('click', () => {
             startTest(testTicketIndex);
         });
-        $('#exitTestBtn').addEventListener('click', () => {
+        document.getElementById('newTicketBtnResult').addEventListener('click', () => {
+            loadNextRandomTicket();
+        });
+        document.getElementById('exitTestBtn').addEventListener('click', () => {
             testModeToggle.checked = false;
             toggleTestMode(false);
+        });
+
+        // ИНТЕРАКТИВНЫЕ КАРТОЧКИ СТАТИСТИКИ
+        const statElements = document.querySelectorAll('.results-stats .stat');
+        const allQuestions = document.querySelectorAll('.result-question');
+
+        statElements.forEach(stat => {
+            stat.style.cursor = 'pointer';
+            stat.addEventListener('click', function () {
+                const category = this.dataset.category;  // correct / wrong / unanswered
+                const isActive = this.classList.contains('active');
+
+                // Сброс, если кликнули по уже активной категории
+                if (isActive) {
+                    statElements.forEach(s => s.classList.remove('active'));
+                    allQuestions.forEach(q => q.style.display = '');
+                    return;
+                }
+
+                // Фильтрация
+                statElements.forEach(s => s.classList.remove('active'));
+                this.classList.add('active');
+
+                allQuestions.forEach(q => {
+                    if (q.dataset.status === category) {
+                        q.style.display = '';
+                    } else {
+                        q.style.display = 'none';
+                    }
+                });
+            });
         });
     }
 
@@ -566,6 +621,8 @@
     });
 
     finishTestBtn.addEventListener('click', finishTest);
+
+    finishTestBtnBottom.addEventListener('click', finishTest);
 
     nextTicketBtn.addEventListener('click', loadNextRandomTicket);
 
