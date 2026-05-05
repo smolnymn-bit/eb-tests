@@ -30,7 +30,9 @@
     const themeToggle = $('#themeToggle');
     const correctOnlyToggle = $('#correctOnlyToggle');
     const testModeToggle = $('#testModeToggle');
-    const testControls = $('#testControls');
+    const testControlsTop = $('#testControlsTop');
+    const testControlsBottom = $('#testControlsBottom');
+    // const testControls = $('#testControls');
     const testResults = $('#testResults');
     const prevQuestionBtn = $('#prevQuestionBtn');
     const nextQuestionBtn = $('#nextQuestionBtn');
@@ -268,49 +270,6 @@
     }
 
     // ========== РЕЖИМ ТЕСТА ==========
-    // function toggleTestMode(enable) {
-    //     testMode = enable;
-    //     if (enable) {
-    //         // Сохраняем текущий индекс для возврата
-    //         if (!testAnswers.length) {
-    //             // Если тест еще не начат, выбираем случайный билет
-    //             const randomIdx = Math.floor(Math.random() * TICKETS_DATA.length);
-    //             startTest(randomIdx);
-    //         } else {
-    //             // Если тест уже идет, просто переключаем отображение
-    //             switchToTestView();
-    //         }
-    //     } else {
-    //         // Возврат к обычному режиму
-    //         testControls.style.display = 'none';
-    //         testResults.style.display = 'none';
-    //         ticketPagination.style.display = '';
-    //         correctOnlyToggle.disabled = false;
-    //         renderTicket(currentTicketIndex, searchQuery);
-    //     }
-    // }
-
-    // function startTest(ticketIndex) {
-    //     testTicketIndex = ticketIndex;
-    //     testQuestionIndex = 0;
-    //     testAnswers = new Array(TICKETS_DATA[ticketIndex].questions.length).fill(null);
-    //     ticketSelect.value = ticketIndex;
-    //     switchToTestView();
-    //     renderTestQuestion();
-    // }
-
-    // function switchToTestView() {
-    //     testControls.style.display = 'flex';
-    //     testResults.style.display = 'none';
-    //     ticketPagination.style.display = 'none';
-    //     questionsList.style.display = '';
-    //     correctOnlyToggle.disabled = true; // в тесте режим "только правильные" не имеет смысла
-
-    //     const ticket = TICKETS_DATA[testTicketIndex];
-    //     ticketTitle.textContent = `Билет ${ticket.id} (тест)`;
-    //     questionCount.textContent = `${ticket.questions.length} вопросов`;
-    // }
-    // ========== РЕЖИМ ТЕСТА (исправленный) ==========
     function toggleTestMode(enable) {
         testMode = enable;
         if (enable) {
@@ -319,7 +278,9 @@
             startTest(randomIdx);
         } else {
             // Возврат к обычному режиму просмотра
-            testControls.style.display = 'none';
+            // testControls.style.display = 'none';
+            testControlsTop.style.display = 'none';
+            testControlsBottom.style.display = 'none';
             testResults.style.display = 'none';
             questionsList.style.display = '';
             ticketPagination.style.display = '';
@@ -335,7 +296,9 @@
         ticketSelect.value = ticketIndex;
 
         // Настройка интерфейса для теста
-        testControls.style.display = 'flex';
+        // testControls.style.display = 'flex';
+        testControlsTop.style.display = 'flex';
+        testControlsBottom.style.display = 'flex';
         testResults.style.display = 'none';
         ticketPagination.style.display = 'none';
         questionsList.style.display = '';
@@ -391,7 +354,7 @@
         questionsList.appendChild(card);
 
         // Обновляем прогресс
-        questionProgress.textContent = `${testQuestionIndex + 1} / ${ticket.questions.length}`;
+        questionProgress.textContent = `${testQuestionIndex + 1} вопрос из ${ticket.questions.length}`;
 
         // Управление кнопками
         prevQuestionBtn.disabled = testQuestionIndex === 0;
@@ -428,7 +391,9 @@
 
         // Скрываем вопросы и показываем результаты
         questionsList.style.display = 'none';
-        testControls.style.display = 'none';
+        // testControls.style.display = 'none';
+        testControlsTop.style.display = 'none';
+        testControlsBottom.style.display = 'none';
         testResults.style.display = 'block';
 
         let resultHTML = `
