@@ -487,6 +487,7 @@ input:checked + .toggle-slider::before {
     align-items: flex-start;
     gap: 0.5rem;
     line-height: 1.45;
+    cursor: pointer;
 }
 .option-item .option-marker {
     flex-shrink: 0;
