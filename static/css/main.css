@@ -868,7 +868,6 @@ input:checked + .toggle-slider::before {
     .header-controls {
         width: 100%;
         justify-content: space-between;
-        margin: 8px 0 8px 0;
     }
     /* Убираем текстовые подписи у тумблеров, оставляем только иконки */
     .toggle-group span {
