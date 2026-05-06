@@ -835,7 +835,7 @@ input:checked + .toggle-slider::before {
         font-size: 0.75rem;
     }
     .main-container {
-        padding: 1rem 0.75rem 2rem;
+        padding: 0.5rem 0.75rem 2rem;
     }
     .question-card {
         padding: 1rem;
