@@ -864,6 +864,7 @@ input:checked + .toggle-slider::before {
 @media (max-width: 480px) {
     .header {
         padding: 0.5rem 0.75rem;
+        margin: 0;
     }
     .header-controls {
         width: 100%;
