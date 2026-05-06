@@ -873,6 +873,9 @@ input:checked + .toggle-slider::before {
         justify-content: space-between;
         margin: 0;
     }
+    .ticket-header {
+        margin-bottom: 0.5rem;
+    }
     /* Убираем текстовые подписи у тумблеров, оставляем только иконки */
     .toggle-group span {
         /*display: none;*/
