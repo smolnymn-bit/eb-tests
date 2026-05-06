@@ -846,6 +846,7 @@ input:checked + .toggle-slider::before {
     }
     .ticket-nav {
         gap: 0.3rem;
+        margin-bottom: 0.5rem;
     }
     .ticket-select {
         font-size: 0.8rem;
