@@ -822,7 +822,6 @@ input:checked + .toggle-slider::before {
     .header-search {
         order: 3;
         width: 100%;
-        margin: 8px 0 8px 0;
     }
     .search-input {
         min-width: auto;
