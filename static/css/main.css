@@ -792,6 +792,7 @@ input:checked + .toggle-slider::before {
     }
     .header-logo {
         font-size: 1rem;
+            margin: 0;
     }
     .header-logo .logo-icon {
         width: 30px;
