@@ -42,14 +42,6 @@ self.addEventListener('install', event => {
   self.skipWaiting();
 });
 
-// Установка: кэшируем основные файлы
-self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(PRECACHE_ASSETS))
-  );
-  self.skipWaiting();
-});
-
 // Активация: удаляем старые кэши
 self.addEventListener('activate', event => {
   event.waitUntil(
