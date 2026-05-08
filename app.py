@@ -1,8 +1,7 @@
 import json
 import re
 from pathlib import Path
-from flask import Flask, render_template, jsonify, send_from_directory
-import os
+from flask import Flask, render_template, jsonify, send_from_directory, Response
 
 app = Flask(__name__)
 
@@ -66,10 +65,24 @@ def parse_tickets(raw_text: str) -> list:
                         "correct": is_correct
                     })
 
+            # Ищем выдержку из нормативки после вариантов ответа
+            citation = None
+            for i, line in enumerate(lines):
+                if line.strip().lower().startswith('выдержка из нормативки'):
+                    cite_lines = [l.strip() for l in lines[i+1:] if l.strip()]
+                    if cite_lines:
+                        citation = '\n'.join(cite_lines)
+                    break
+            if citation:
+                print(f"✅ Найдена выдержка для вопроса: {q_text[:60]}...")
+            else:
+                print(f"❌ Нет выдержки для вопроса: {q_text[:60]}...")
+
             if q_text and options:
                 questions.append({
                     "text": q_text,
-                    "options": options
+                    "options": options,
+                    "citation": citation
                 })
 
         if questions:
@@ -99,16 +112,16 @@ def api_ticket(ticket_id):
         return jsonify(ticket)
     return jsonify({"error": "Билет не найден"}), 404
 
+# Специальный маршрут для sw.js с нужным заголовком
 @app.route('/sw.js')
 def service_worker():
-    """Отдаём Service Worker из корня проекта с правильными заголовками"""
-    response = send_from_directory('.', 'sw.js')
+    response = send_from_directory('static', 'sw.js')
     response.headers['Service-Worker-Allowed'] = '/'
-    response.headers['Content-Type'] = 'application/javascript'
+    response.headers['Cache-Control'] = 'no-cache'
     return response
-    
+
 if __name__ == '__main__':
     print(f"✅ Загружено билетов: {len(TICKETS)}")
     print(f"✅ Всего вопросов: {sum(len(t['questions']) for t in TICKETS)}")
-    port = int(os.environ.get("PORT", 52026))
-    app.run(host='0.0.0.0', port=port, debug=False)
+    print("🚀 Сервер запущен: http://127.0.0.1:52026")
+    app.run(debug=True, host='0.0.0.0', port=52026)
