@@ -1,4 +1,4 @@
-const CACHE_NAME = 'eb-tests-v1';
+const CACHE_NAME = 'eb-tests-v2';
 const PRECACHE_ASSETS = [
   '/',
   '/static/css/main.css',
