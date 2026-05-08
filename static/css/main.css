@@ -156,6 +156,42 @@ body {
 }
 
 /* ========== BUTTONS & CONTROLS ========== */
+/* Кнопка "Наверх" */
+#scrollToTopBtn {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    z-index: 1000;
+    transition: opacity 0.3s, transform 0.3s;
+}
+#scrollToTopBtn:hover {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+}
+#scrollToTopBtn.show {
+    display: flex;
+}
+@media (max-width: 768px) {
+    #scrollToTopBtn {
+        bottom: 1rem;
+        right: 1rem;
+        width: 42px;
+        height: 42px;
+        font-size: 1rem;
+    }
+}
 .btn {
     display: inline-flex;
     align-items: center;
@@ -601,12 +637,19 @@ input:checked + .toggle-slider::before {
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    margin-bottom: 1.5rem;
+    margin: 0px 0px 10px 0px;
     padding: 0.75rem 0.5rem;
     background: var(--bg-secondary);
     border-radius: 12px;
     flex-wrap: wrap;
 }
+/* .test-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 12px 0;
+} */
 .test-progress {
     font-weight: 600;
     font-size: 0.9rem;
@@ -783,6 +826,146 @@ input:checked + .toggle-slider::before {
     padding: 1px 4px;
     border-radius: 50%;
 }
+
+/*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  */
+
+/* ========== ТАЙМЕР И ПРОГРЕСС-БАР ========== */
+.test-top-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.2rem;
+    width: 100%;
+}
+.timer-display {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-light);
+    padding: 0rem 0.5rem;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+.progress-bar-container {
+    /* flex: 1 1 80px; */
+    flex: 0 1 80px;
+    height: 8px;
+    background: var(--input-bg);
+    border-radius: 4px;
+    overflow: hidden;
+    min-width: 60px;
+}
+.progress-bar-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 0.3s ease;
+}
+.test-top-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.25rem;
+    width: 100%;
+    justify-content: space-between;
+}
+.small-toggle {
+    padding: 4px 8px !important;
+    font-size: 0.75rem !important;
+    gap: 0.2rem !important;
+}
+
+.test-top-row-time {
+    min-width: 50%;
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: nowrap;
+    flex: 1 80px;    
+}
+button#randomQuestionsBtn {
+    flex: 1 140px;
+}
+button#nextTicketBtn {
+    flex: 1 140px;
+}
+/* ========== СЕТКА ВОПРОСОВ ========== */
+.question-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin: 0.75rem 0 0.5rem;
+}
+.question-grid-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 2px solid var(--card-border);
+    background: var(--card-bg);
+    color: var(--text);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.question-grid-btn:hover {
+    border-color: var(--accent);
+}
+.question-grid-btn.current {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,150,214,0.2);
+}
+.question-grid-btn.correct-answer {
+    background: var(--correct-bg);
+    border-color: var(--correct-border);
+    color: var(--correct-text);
+}
+.question-grid-btn.wrong-answer {
+    background: #fef2f2;
+    border-color: #fca5a5;
+    color: #991b1b;
+}
+.question-grid-btn.unanswered {
+    background: var(--bg-secondary);
+}
+
+.test-controls .btn {
+    flex: 1 1 0;               /* кнопки делят доступное пространство поровну */
+    min-width: 0;              /* чтобы текст мог переноситься */
+    white-space: normal;
+    text-align: center;
+}
+div#testControlsBottom {
+    margin-top: 10px;
+}
+
+/* Выдержка из нормативки */
+.citation-block {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    background: var(--bg-secondary);
+    border-left: 4px solid var(--accent);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+.citation-title {
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.4rem;
+    color: var(--accent);
+}
+.citation-text {
+    line-height: 1.5;
+}
+
+/* Удалите или закомментируйте устаревшие .single-btn, если были */
+
+/*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  */
+
 /* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
     .header {
@@ -878,17 +1061,18 @@ input:checked + .toggle-slider::before {
         margin-bottom: 0.5rem;
     }
     /* Убираем текстовые подписи у тумблеров, оставляем только иконки */
-    .toggle-group span {
-        /*display: none;*/
-    }
+    /* .toggle-group span {
+        display: none;
+    } */
     /* Показываем иконки солнца/луны и галочки вместо текста */
     .toggle-group:first-of-type span,
     .toggle-group:nth-of-type(2) span {
         display: inline; /* оставляем иконки */
     }
-    .toggle-group:nth-of-type(3) span {
-        /*display: none; /* скрываем "Учить"/"Тест" полностью, пусть висит только переключатель */*/
-    }
+    /* скрываем "Учить"/"Тест" полностью, пусть висит только переключатель*/
+    /* .toggle-group:nth-of-type(3) span {
+        display: none; 
+    } */
     .ticket-pagination {
         gap: 0.15rem;
     }
@@ -910,13 +1094,18 @@ input:checked + .toggle-slider::before {
         .test-controls {
         gap: 0.5rem;
         padding: 0.5rem;
+        margin: 0px 0px 4px 0px;
+    }
+    div#testControlsBottom {
+        margin: 4px 0px 0px 0px;
     }
     .test-controls {
         justify-content: space-around;
-        gap: 0.4rem;
+        gap: 0 0.4rem;
     }
     .test-controls .btn {
-        flex: 1 1 auto;
+        /* flex: 1 1 auto; */
+        flex: 1 140px;
         min-width: 0;
         padding: 0.5rem 0.3rem;
         font-size: 0.7rem;
@@ -929,21 +1118,6 @@ input:checked + .toggle-slider::before {
     .test-progress {
         font-size: 0.8rem;
     }
-}
-
-.test-controls {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin: 12px 0;
-}
-
-.test-controls .btn {
-    flex: 1 1 0;               /* кнопки делят доступное пространство поровну */
-    min-width: 0;              /* чтобы текст мог переноситься */
-    white-space: normal;
-    text-align: center;
 }
 
 /* Прогресс-бар между кнопками не должен сжиматься */
