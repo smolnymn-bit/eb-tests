@@ -7,7 +7,13 @@ const PRECACHE_ASSETS = [
   '/static/img/favicon.png',
   '/static/icons/icon-192x192.png',
   '/static/icons/icon-512x512.png',
-  '/static/manifest.json'
+  '/static/manifest.json',
+  '/static/sounds/correct.mp3',
+  '/static/sounds/wrong.mp3',
+  '/static/webfonts/fa-solid-900.woff2',
+  '/static/webfonts/fa-regular-400.woff2',
+  '/static/webfonts/fa-brands-400.woff2',
+  '/static/webfonts/fa-v4compatibility.woff2',
 ];
 
 // Установка: кэшируем основные файлы
