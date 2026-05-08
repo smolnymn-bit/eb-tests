@@ -5,6 +5,9 @@
     // ========== STATE ==========
     let currentTicketIndex = 0;
     let correctOnly = false;
+
+    let showCitations = false;
+
     let searchQuery = '';
     let isDarkTheme = false;
 
@@ -13,6 +16,15 @@
     let testTicketIndex = 0;          // индекс билета в TICKETS_DATA
     let testQuestionIndex = 0;        // индекс вопроса в билете
     let testAnswers = [];             // массив ответов: null или {selected: Number, correct: Boolean}
+    // Дополнительные параметры теста
+    let testTicketData = null;        // текущий билет (может быть перемешанным или случайным)
+    let isRandomMode = false;        // режим "Случайные вопросы"
+    let soundEnabled = false;        // звук
+    let autoAdvance = false;         // флаг автоперехода
+    let autoAdvanceTimeout = null;   // идентификатор таймера
+    let timerInterval = null;
+    let timerSeconds = 0;
+    let timerEndTime = null;  // время, когда таймер должен закончиться (мс Unix)
 
     // ========== DOM REFS ==========
     const $ = (s) => document.querySelector(s);
@@ -29,6 +41,9 @@
     const emptyState = $('#emptyState');
     const themeToggle = $('#themeToggle');
     const correctOnlyToggle = $('#correctOnlyToggle');
+
+    const showCitationsToggle = $('#showCitationsToggle');
+
     const testModeToggle = $('#testModeToggle');
     const testControlsTop = $('#testControlsTop');
     const testControlsBottom = $('#testControlsBottom');
@@ -40,6 +55,15 @@
     const finishTestBtnBottom = $('#finishTestBtnBottom');  // новая
     const nextTicketBtn = $('#nextTicketBtn');
     const questionProgress = $('#questionProgress');
+
+    const shuffleToggle = $('#shuffleToggle');
+    const soundToggle = $('#soundToggle');
+    const gridToggle = $('#gridToggle');
+    const timerDisplay = $('#timerDisplay');
+    const progressFill = $('#progressFill');
+    const questionGrid = $('#questionGrid');
+    const randomQuestionsBtn = $('#randomQuestionsBtn');
+    const autoAdvanceToggle = $('#autoAdvanceToggle');
 
     // ========== UTILS ==========
     function escapeHTML(str) {
@@ -107,6 +131,7 @@
     }
 
     // ========== RENDER (обычный режим) ==========
+
     function renderQuestionCard(q, index, highlightTerm) {
         const showAll = !correctOnly;
         const card = document.createElement('div');
@@ -115,6 +140,13 @@
 
         const numLabel = `ВОПРОС ${index + 1} / 10`;
         const qText = highlightTerm.length >= 2 ? highlightText(q.text, highlightTerm) : q.text;
+
+        // Сначала формируем блок выдержки (если нужно)
+        const citationHtml = (showCitations && q.citation) ? `
+            <div class="citation-block">
+                <div class="citation-title">Выдержка из нормативки</div>
+                <div class="citation-text">${q.citation.replace(/\n/g, '<br>')}</div>
+            </div>` : '';
 
         card.innerHTML = `
             <div class="q-number">${numLabel}</div>
@@ -134,6 +166,7 @@
                         </li>`;
                 }).join('')}
             </ul>
+            ${citationHtml}
         `;
         return card;
     }
@@ -292,6 +325,150 @@
         });
     }
 
+    function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+    }
+
+    // Звуковые эффекты (Web Audio API)  // осциллятор
+    // function playSound(type) {
+    //     if (!soundEnabled) return;
+    //     try {
+    //         const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    //         const osc = ctx.createOscillator();
+    //         const gain = ctx.createGain();
+    //         osc.connect(gain);
+    //         gain.connect(ctx.destination);
+    //         if (type === 'correct') {
+    //             osc.frequency.value = 880;
+    //             osc.type = 'sine';
+    //             gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    //             gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2);
+    //             osc.start(ctx.currentTime);
+    //             osc.stop(ctx.currentTime + 0.2);
+    //         } else {
+    //             osc.frequency.value = 200;
+    //             osc.type = 'square';
+    //             gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    //             gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+    //             osc.start(ctx.currentTime);
+    //             osc.stop(ctx.currentTime + 0.3);
+    //         }
+    //     } catch(e) {}
+    // }
+
+    function playSound(type) {
+        if (!soundEnabled) return;
+        try {
+            const audioId = type === 'correct' ? 'soundCorrect' : 'soundWrong';
+            const audio = document.getElementById(audioId);
+            if (audio) {
+                audio.currentTime = 0;  // перемотка на начало для быстрых повторных кликов
+                audio.play().catch(e => {}); // игнорируем ошибки (например, если файла нет)
+            }
+        } catch(e) {}
+    }
+
+    // Таймер
+    // function startTimer() {
+    //     stopTimer();
+    //     timerSeconds = 20 * 60; // 20 минут
+    //     updateTimerDisplay();
+    //     timerInterval = setInterval(() => {
+    //         timerSeconds--;
+    //         updateTimerDisplay();
+    //         if (timerSeconds <= 0) {
+    //             stopTimer();
+    //             finishTest(); // автоматическое завершение
+    //         }
+    //     }, 1000);
+    // }
+    function startTimer() {
+        stopTimer();
+        const durationMs = 20 * 60 * 1000; // 20 минут в миллисекундах
+        timerEndTime = Date.now() + durationMs;
+        timerSeconds = Math.ceil((timerEndTime - Date.now()) / 1000);
+        updateTimerDisplay();
+
+        timerInterval = setInterval(() => {
+            const remaining = timerEndTime - Date.now();
+            if (remaining <= 0) {
+                timerSeconds = 0;
+                updateTimerDisplay();
+                stopTimer();
+                finishTest();
+                return;
+            }
+            timerSeconds = Math.ceil(remaining / 1000);
+            updateTimerDisplay();
+        }, 1000);
+    }
+
+    // function stopTimer() {
+    //     if (timerInterval) {
+    //         clearInterval(timerInterval);
+    //         timerInterval = null;
+    //     }
+    // }
+    function stopTimer() {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+        }
+        timerEndTime = null;
+    }
+
+    // function updateTimerDisplay() {
+    //     const mins = Math.floor(timerSeconds / 60);
+    //     const secs = timerSeconds % 60;
+    //     timerDisplay.textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+    //     if (timerSeconds < 60) {
+    //         timerDisplay.style.color = '#ef4444'; // красный, когда осталось меньше минуты
+    //     } else {
+    //         timerDisplay.style.color = '';
+    //     }
+    // }
+    function updateTimerDisplay() {
+        const mins = Math.floor(timerSeconds / 60);
+        const secs = timerSeconds % 60;
+        timerDisplay.textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+        if (timerSeconds < 60) {
+            timerDisplay.style.color = '#ef4444'; // красный, когда осталось меньше минуты
+        } else {
+            timerDisplay.style.color = '';
+        }
+    }
+
+    // Построение / обновление сетки вопросов
+    function buildQuestionGrid() {
+        if (!testTicketData) return;
+        const questions = testTicketData.questions;
+        questionGrid.innerHTML = '';
+        questions.forEach((q, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'question-grid-btn';
+            btn.textContent = idx + 1;
+            // статус ответа
+            const ans = testAnswers[idx];
+            if (ans) {
+                btn.classList.add(ans.correct ? 'correct-answer' : 'wrong-answer');
+            } else {
+                btn.classList.add('unanswered');
+            }
+            if (idx === testQuestionIndex) btn.classList.add('current');
+            btn.addEventListener('click', () => {
+                testQuestionIndex = idx;
+                renderTestQuestion();
+                buildQuestionGrid(); // обновить выделение
+            });
+            questionGrid.appendChild(btn);
+        });
+        // показать/скрыть согласно gridToggle
+        questionGrid.style.display = gridToggle.checked ? 'flex' : 'none';
+    }
+
     // ========== РЕЖИМ ТЕСТА ==========
     function toggleTestMode(enable) {
         testMode = enable;
@@ -301,28 +478,83 @@
             startTest(randomIdx);
             const correctOnlyGroup = correctOnlyToggle.closest('.toggle-group');
             if (correctOnlyGroup) correctOnlyGroup.classList.add('hidden-placeholder');
+            const citationsGroup = showCitationsToggle.closest('.toggle-group');
+            if (citationsGroup) citationsGroup.classList.add('hidden-placeholder');
         } else {
             // Возврат к обычному режиму просмотра
             testControlsTop.style.display = 'none';
             testControlsBottom.style.display = 'none';
+            stopTimer();
+            questionGrid.style.display = 'none';
+            testTicketData = null; // явно обнулять testTicketData, чтобы избежать случайных ссылок на старый тест:
             testResults.style.display = 'none';
             questionsList.style.display = '';
             ticketPagination.style.display = '';
             correctOnlyToggle.disabled = false;
             const correctOnlyGroup = correctOnlyToggle.closest('.toggle-group');
             if (correctOnlyGroup) correctOnlyGroup.classList.remove('hidden-placeholder');
+            const citationsGroup = showCitationsToggle.closest('.toggle-group');
+            if (citationsGroup) citationsGroup.classList.remove('hidden-placeholder');
             renderTicket(currentTicketIndex, searchQuery);
         }
     }
 
-    function startTest(ticketIndex) {
-        testTicketIndex = ticketIndex;
-        testQuestionIndex = 0;
-        testAnswers = new Array(TICKETS_DATA[ticketIndex].questions.length).fill(null);
-        ticketSelect.value = ticketIndex;
+    function startTest(ticketIndex, options = {}) {
+        const { randomQuestions = false, questionCount = 20 } = options;
+        isRandomMode = randomQuestions;
+        
+        // Сбор данных для теста
+        let questions;
+        let ticketId;
+        if (randomQuestions) {
+            // Случайные вопросы из всех билетов
+            const allQuestions = [];
+            TICKETS_DATA.forEach(ticket => {
+                ticket.questions.forEach(q => allQuestions.push({ ...q, ticketId: ticket.id }));
+            });
+            const totalAvailable = allQuestions.length;
+            const count = Math.min(questionCount, totalAvailable);
+            const selected = [];
+            const usedIndices = new Set();
+            while (selected.length < count) {
+                const idx = Math.floor(Math.random() * totalAvailable);
+                if (!usedIndices.has(idx)) {
+                    usedIndices.add(idx);
+                    selected.push(allQuestions[idx]);
+                }
+            }
+            questions = selected;
+            ticketId = '?'; // виртуальный билет
+        } else {
+            // Обычный билет
+            const ticket = TICKETS_DATA[ticketIndex];
+            questions = ticket.questions.map(q => ({ ...q }));
+            ticketId = ticket.id;
+        }
 
-        // Настройка интерфейса для теста
-        // testControls.style.display = 'flex';
+        // Перемешивание (если включено)
+        if (shuffleToggle.checked) {
+            shuffleArray(questions);
+            questions = questions.map(q => {
+                const opts = [...q.options];
+                shuffleArray(opts);
+                return { ...q, options: opts };
+            });
+        }
+
+        testTicketData = { id: ticketId, questions };
+        testTicketIndex = ticketIndex; // для информации, хотя не используется при random
+        testQuestionIndex = 0;
+        testAnswers = new Array(questions.length).fill(null);
+        // Синхронизация селектора билетов
+        if (randomQuestions) {
+            ticketSelect.disabled = true;   // в случайном режиме блокируем выбор билета
+        } else {
+            ticketSelect.disabled = false;
+            ticketSelect.value = ticketIndex;
+}
+
+        // UI
         testControlsTop.style.display = 'flex';
         testControlsBottom.style.display = 'flex';
         testResults.style.display = 'none';
@@ -330,15 +562,27 @@
         questionsList.style.display = '';
         correctOnlyToggle.disabled = true;
 
-        const ticket = TICKETS_DATA[testTicketIndex];
-        ticketTitle.textContent = `Билет № ${ticket.id} (тест)`;
-        questionCount.textContent = `${ticket.questions.length} вопросов`;
+        const ticketLabel = randomQuestions ? 'Случайные вопросы' : `Билет ${ticketId}`;
+        ticketTitle.textContent = `${ticketLabel} (тест)`;
+        questionCount.textContent = `${questions.length} вопросов`;
+
+        // Таймер
+        if (randomQuestions) {
+            timerDisplay.style.display = 'none'; // без таймера
+            stopTimer();
+        } else {
+            timerDisplay.style.display = '';
+            startTimer();
+        }
 
         renderTestQuestion();
+        autoAdvanceToggle.checked = autoAdvance;
+        buildQuestionGrid();
     }
 
     function renderTestQuestion() {
-        const ticket = TICKETS_DATA[testTicketIndex];
+        if (!testTicketData) return;
+        const ticket = testTicketData;
         const q = ticket.questions[testQuestionIndex];
         const userAnswer = testAnswers[testQuestionIndex];
 
@@ -355,7 +599,6 @@
                 ${q.options.map((opt, oi) => {
                     let cls = 'option-item';
                     let marker = '';
-                    // Определяем состояние подсветки
                     if (userAnswer) {
                         if (opt.correct) {
                             cls += ' correct';
@@ -365,7 +608,6 @@
                             marker = '✗';
                         }
                     }
-                    // data-атрибут для обработки клика
                     return `
                         <li class="${cls}" data-option-index="${oi}">
                             <span class="option-marker">${marker}</span>
@@ -374,34 +616,51 @@
                 }).join('')}
             </ul>
         `;
-
         questionsList.appendChild(card);
 
-        // Обновляем прогресс
-        questionProgress.textContent = `${testQuestionIndex + 1} вопрос из ${ticket.questions.length}`;
+        // Прогресс
+        const total = ticket.questions.length;
+        const current = testQuestionIndex + 1;
+        questionProgress.textContent = `${current} вопрос из ${total}`;
+        progressFill.style.width = (current / total * 100) + '%';
 
-        // Управление кнопками
+        // Кнопки
         prevQuestionBtn.disabled = testQuestionIndex === 0;
-        nextQuestionBtn.disabled = testQuestionIndex === ticket.questions.length - 1;
+        nextQuestionBtn.disabled = testQuestionIndex === total - 1;
 
-        // Верхняя панель: показываем «Завершить» только после первого ответа
+        // Верхняя панель: завершить только после первого ответа
         const anyAnswered = testAnswers.some(a => a !== null);
         finishTestBtn.style.display = anyAnswered ? 'inline-flex' : 'none';
-        // Когда «Завершить» скрыт, прогресс тоже прячем, а кнопка «Случайный билет» растягивается
-        questionProgress.style.display = anyAnswered ? '' : 'none';
-        // Настройка растяжения кнопки «Случайный билет» делается через CSS-класс
-        testControlsTop.classList.toggle('single-btn', !anyAnswered);
 
-        // Нижняя кнопка «Завершить» вместо «Следующий вопрос» на последнем вопросе при всех ответах
-        const isLast = testQuestionIndex === ticket.questions.length - 1;
+        // Нижняя кнопка Завершить вместо Следующий вопрос на последнем вопросе при всех ответах
+        const isLast = testQuestionIndex === total - 1;
         const allAnswered = testAnswers.every(a => a !== null);
-
         if (isLast && allAnswered) {
             nextQuestionBtn.style.display = 'none';
             finishTestBtnBottom.style.display = 'inline-flex';
         } else {
             nextQuestionBtn.style.display = 'inline-flex';
             finishTestBtnBottom.style.display = 'none';
+        }
+
+        // Сброс таймера автоперехода
+        if (autoAdvanceTimeout) {
+            clearTimeout(autoAdvanceTimeout);
+            autoAdvanceTimeout = null;
+        }
+
+        // Обновить сетку (сохраняя видимость)
+        if (gridToggle.checked) buildQuestionGrid();
+
+        // Прокрутка к нижним кнопкам на мобильных экранах
+        if (window.innerWidth <= 768) {
+            const bottom = testControlsBottom;
+            if (bottom && bottom.style.display !== 'none') {
+                const rect = bottom.getBoundingClientRect();
+                if (rect.bottom > window.innerHeight || rect.top < 0) {
+                    bottom.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }
         }
     }
 
@@ -413,7 +672,7 @@
         if (testAnswers[testQuestionIndex] !== null) return;
 
         const optionIndex = parseInt(optionItem.dataset.optionIndex);
-        const question = TICKETS_DATA[testTicketIndex].questions[testQuestionIndex];
+        const question = testTicketData.questions[testQuestionIndex];
         const isCorrect = question.options[optionIndex].correct;
 
         // Сохраняем ответ
@@ -422,12 +681,22 @@
             correct: isCorrect
         };
 
-        // Перерисовываем карточку с подсветкой
+        playSound(isCorrect ? 'correct' : 'wrong');
         renderTestQuestion();
+        // Автопереход только при правильном ответе
+        if (autoAdvance && isCorrect) {
+            const total = testTicketData.questions.length;
+            if (testQuestionIndex < total - 1) {
+                autoAdvanceTimeout = setTimeout(() => {
+                    testQuestionIndex++;
+                    renderTestQuestion();
+                }, 1000);
+            }
+        }
     }
 
     function finishTest() {
-        const ticket = TICKETS_DATA[testTicketIndex];
+        const ticket = testTicketData;
         const total = ticket.questions.length;
         const correctCount = testAnswers.filter(a => a && a.correct).length;
         const wrongCount = testAnswers.filter(a => a && !a.correct).length;
@@ -437,11 +706,22 @@
         questionsList.style.display = 'none';
         testControlsTop.style.display = 'none';
         testControlsBottom.style.display = 'none';
+        stopTimer();
+        if (autoAdvanceTimeout) {
+            clearTimeout(autoAdvanceTimeout);
+            autoAdvanceTimeout = null;
+        }
+        questionGrid.style.display = 'none';
+        ticketSelect.disabled = false;
         testResults.style.display = 'block';
+        // Показать тумблер выдержек на странице результатов
+        const citationsGroup = showCitationsToggle.closest('.toggle-group');
+        if (citationsGroup) citationsGroup.classList.remove('hidden-placeholder');
 
         let resultHTML = `
             <div class="results-card">
-                <h2 class="results-title">Результаты теста — Билет ${ticket.id}</h2>
+                <!-- <h2 class="results-title">Результаты теста — Билет ${ticket.id}</h2> -->
+                <h2 class="results-title">Результаты теста — Билет ${ticket.id === '?' ? 'Случайные вопросы' : ticket.id}</h2>
                 <div class="results-stats">
                     <div class="stat correct" data-category="correct"><span class="stat-num">${correctCount}</span> правильно</div>
                     <div class="stat wrong" data-category="wrong"><span class="stat-num">${wrongCount}</span> неправильно</div>
@@ -472,7 +752,13 @@
                                         return `<li class="${cls}"><span class="option-marker">${marker}</span> ${opt.text}</li>`;
                                     }).join('')}
                                 </ul>
+                                ${showCitations && q.citation ? `
+                                <div class="citation-block" style="margin-top:0.75rem;">
+                                    <div class="citation-title">Выдержка из нормативки</div>
+                                    <div class="citation-text">${q.citation.replace(/\n/g, '<br>')}</div>
+                                </div>` : ''}
                             </div>
+                            
                         `;
                     }).join('')}
                 </div>
@@ -609,11 +895,67 @@
         }
     });
 
+    showCitationsToggle.addEventListener('change', () => {
+        showCitations = showCitationsToggle.checked;
+        localStorage.setItem('eb-show-citations', showCitations ? '1' : '0');
+        if (!testMode) {
+            renderTicket(currentTicketIndex, searchQuery);
+        } else if (testResults.style.display !== 'none') {
+            // Перерисовка результатов с учётом выдержек
+            finishTest();
+        }
+    });
+
     testModeToggle.addEventListener('change', () => {
         toggleTestMode(testModeToggle.checked);
     });
 
     // ========== TEST CONTROLS EVENTS ==========
+
+    // Звук
+    soundToggle.addEventListener('change', () => {
+        soundEnabled = soundToggle.checked;
+        localStorage.setItem('eb-sound', soundEnabled ? '1' : '0');
+    });
+
+    // Сетка
+    gridToggle.addEventListener('change', () => {
+        questionGrid.style.display = gridToggle.checked ? 'flex' : 'none';
+        if (gridToggle.checked) buildQuestionGrid();
+    });
+
+    // Случайные вопросы
+    randomQuestionsBtn.addEventListener('click', () => {
+        const num = prompt('Сколько вопросов (максимум 50)?', '20');
+        const count = parseInt(num, 10);
+        if (isNaN(count) || count < 1) return;
+        const realCount = Math.min(count, 50);
+        startTest(0, { randomQuestions: true, questionCount: realCount });
+    });
+
+    // Автопереход
+    autoAdvanceToggle.addEventListener('change', () => {
+        autoAdvance = autoAdvanceToggle.checked;
+        if (!autoAdvance && autoAdvanceTimeout) {
+            clearTimeout(autoAdvanceTimeout);
+            autoAdvanceTimeout = null;
+        }
+    });
+
+    // Перемешивание – перезапуск теста при изменении
+    shuffleToggle.addEventListener('change', () => {
+        if (!testMode) return;
+        // Сохраняем текущий тип теста (обычный билет или случайный)
+        if (isRandomMode) {
+            // Перезапускаем случайный тест с тем же количеством вопросов
+            const currentCount = testAnswers.length;
+            startTest(0, { randomQuestions: true, questionCount: currentCount });
+        } else {
+            // Перезапускаем текущий билет
+            startTest(testTicketIndex);
+        }
+    });
+
     prevQuestionBtn.addEventListener('click', () => {
         if (testQuestionIndex > 0) {
             testQuestionIndex--;
@@ -622,7 +964,8 @@
     });
 
     nextQuestionBtn.addEventListener('click', () => {
-        const ticket = TICKETS_DATA[testTicketIndex];
+        // const ticket = TICKETS_DATA[testTicketIndex];
+        const ticket = testTicketData;
         if (testQuestionIndex < ticket.questions.length - 1) {
             testQuestionIndex++;
             renderTestQuestion();
@@ -654,7 +997,7 @@
         } else if (e.key === 'ArrowRight') {
             e.preventDefault();
             if (testMode) {
-                const ticket = TICKETS_DATA[testTicketIndex];
+                const ticket = testTicketData;
                 if (testQuestionIndex < ticket.questions.length - 1) {
                     testQuestionIndex++;
                     renderTestQuestion();
@@ -681,6 +1024,18 @@
             correctOnlyToggle.checked = true;
         }
 
+        const savedShowCitations = localStorage.getItem('eb-show-citations');
+        if (savedShowCitations === '1') {
+            showCitations = true;
+            showCitationsToggle.checked = true;
+        }
+
+        const savedSound = localStorage.getItem('eb-sound');
+        if (savedSound === '1') {
+            soundEnabled = true;
+            soundToggle.checked = true;
+        }
+
         populateTicketSelect();
 
         let startIndex = 0;
@@ -697,6 +1052,20 @@
         });
     }
 
-    init();
+        init();
+    // Кнопка "Наверх"
+    const scrollToTopBtn = document.getElementById('scrollToTopBtn');
+    if (scrollToTopBtn) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                scrollToTopBtn.classList.add('show');
+            } else {
+                scrollToTopBtn.classList.remove('show');
+            }
+        });
+        scrollToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
     console.log('⚡ Режим теста активирован');
 })();
