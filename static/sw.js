@@ -1,4 +1,5 @@
-const CACHE_NAME = 'eb-tests-v2';
+const CACHE_NAME = 'eb-tests-v3';
+
 const PRECACHE_ASSETS = [
   '/',
   '/static/css/main.css',
@@ -8,32 +9,37 @@ const PRECACHE_ASSETS = [
   '/static/icons/icon-192x192.png',
   '/static/icons/icon-512x512.png',
   '/static/manifest.json',
-  '/static/sounds/correct.mp3',
-  '/static/sounds/wrong.mp3',
   '/static/webfonts/fa-solid-900.woff2',
   '/static/webfonts/fa-regular-400.woff2',
   '/static/webfonts/fa-brands-400.woff2',
   '/static/webfonts/fa-v4compatibility.woff2',
 ];
 
-// Установка: кэшируем основные файлы
+const AUDIO_ASSETS = [
+  '/static/sounds/correct.mp3',
+  '/static/sounds/wrong.mp3',
+];
+
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(PRECACHE_ASSETS))
-  );
-  self.skipWaiting();
-});
+    caches.open(CACHE_NAME).then(async cache => {
+      // Обычные файлы — через addAll
+      await cache.addAll(PRECACHE_ASSETS);
 
-// Активация: удаляем старые кэши
-self.addEventListener('activate', event => {
-  event.waitUntil(
-    caches.keys().then(keys => {
-      return Promise.all(
-        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
-      );
+      // Аудио — вручную, без Range-заголовков
+      for (const url of AUDIO_ASSETS) {
+        const response = await fetch(url, { headers: { Range: '' } });
+        // Если сервер всё равно вернул 206 — делаем новый запрос без кэша
+        if (response.status === 206 || !response.ok) {
+          const fullResponse = await fetch(url, { cache: 'no-store' });
+          if (fullResponse.ok) await cache.put(url, fullResponse);
+        } else {
+          await cache.put(url, response);
+        }
+      }
     })
   );
-  self.clients.claim();
+  self.skipWaiting();
 });
 
 // Обслуживание запросов: кэш-первый, сеть-второй
