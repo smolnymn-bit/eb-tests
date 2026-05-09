@@ -45,16 +45,69 @@ def parse_tickets(raw_text: str) -> list:
             if not q_block:
                 continue
 
+            # lines = q_block.split('\n')
+            # first_line = lines[0].strip()
+            # q_text = re.sub(r'^\d+\.\s*', '', first_line).strip()
+
+            # options = []
+            # for line in lines[1:]:
+            #     line = line.strip()
+            #     if not line:
+            #         continue
+            #     # option_match = re.match(r'^[-•]\s*(✅?\s*)\[?\s*\]?\s*(.*)', line)
+            #     option_match = re.match(r'\s*[-•]\s*(✅?\s*)\[?\s*\]?\s*(.*)', line)
+            #     if option_match:
+            #         marker = option_match.group(1).strip()
+            #         text = option_match.group(2).strip()
+            #         is_correct = '✅' in marker or '✅' in line[:5]
+            #         options.append({
+            #             "text": text,
+            #             "correct": is_correct
+            #         })
+
+            # # Ищем выдержку из нормативки после вариантов ответа
+            # citation = None
+            # for i, line in enumerate(lines):
+            #     if line.strip().lower().startswith('выдержка из нормативки'):
+            #         cite_lines = [l.strip() for l in lines[i+1:] if l.strip()]
+            #         if cite_lines:
+            #             citation = '\n'.join(cite_lines)
+            #         break
+            # if citation:
+            #     print(f"✅ Найдена выдержка для вопроса: {q_text[:60]}...")
+            # else:
+            #     print(f"❌ Нет выдержки для вопроса: {q_text[:60]}...")
+
+            # if q_text and options:
+            #     questions.append({
+            #         "text": q_text,
+            #         "options": options,
+            #         "citation": citation
+            #     })
             lines = q_block.split('\n')
             first_line = lines[0].strip()
             q_text = re.sub(r'^\d+\.\s*', '', first_line).strip()
 
             options = []
+            citation = None
+            found_citation = False
+            cite_lines = []
+
             for line in lines[1:]:
                 line = line.strip()
                 if not line:
                     continue
-                # option_match = re.match(r'^[-•]\s*(✅?\s*)\[?\s*\]?\s*(.*)', line)
+
+                # Как только встретили выдержку – всё остальное до конца блока идёт в цитату
+                if line.lower().startswith('выдержка из нормативки'):
+                    found_citation = True
+                    continue
+
+                if found_citation:
+                    cite_lines.append(line)
+                    continue
+
+                # Ищем вариант ответа (только до выдержки)
                 option_match = re.match(r'\s*[-•]\s*(✅?\s*)\[?\s*\]?\s*(.*)', line)
                 if option_match:
                     marker = option_match.group(1).strip()
@@ -65,14 +118,10 @@ def parse_tickets(raw_text: str) -> list:
                         "correct": is_correct
                     })
 
-            # Ищем выдержку из нормативки после вариантов ответа
-            citation = None
-            for i, line in enumerate(lines):
-                if line.strip().lower().startswith('выдержка из нормативки'):
-                    cite_lines = [l.strip() for l in lines[i+1:] if l.strip()]
-                    if cite_lines:
-                        citation = '\n'.join(cite_lines)
-                    break
+            # Формируем цитату, если нашли выдержку
+            if found_citation and cite_lines:
+                citation = '\n'.join(cite_lines)
+
             if citation:
                 print(f"✅ Найдена выдержка для вопроса: {q_text[:60]}...")
             else:
