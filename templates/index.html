@@ -3,8 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ЭБ 1256.19. Тесты Ростехнадзора по электробезопасности 3 группа до 1000 В  | Подготовка к экзамену</title>
+    <title>ЭБ 1256.19. Тесты Ростехнадзора по электробезопасности 3 группа до 1000 В | Подготовка к экзамену</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
+    <script>
+    // Применяем тему до отрисовки страницы
+    (function() {
+        var theme = localStorage.getItem('eb-theme');
+        if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+    })();
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.all.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="manifest" href="/static/manifest.json">
@@ -13,6 +22,7 @@
 
     <!-- ========== HEADER ========== -->
     <header class="header">
+        <button id="burgerBtn" class="burger-btn"><i class="fa-solid fa-bars"></i></button>
         <a href="/" class="header-logo" title="На главную">
             <div class="logo-icon"><i class="fa-solid fa-bolt"></i></div>
             <span>ЭБ 1256.19. Тесты РТН 3 группа</span>
@@ -24,203 +34,276 @@
             <span class="search-results-badge" id="searchBadge"></span>
             <div class="search-results-dropdown" id="searchDropdown"></div>
         </div>
-        <div class="header-controls">
-            <!-- Темы -->
-            <div class="toggle-group">
-                <span><i class="fa-solid fa-sun"></i></span>
-                <label class="toggle-switch" title="Переключить тему">
-                    <input type="checkbox" id="themeToggle">
-                    <span class="toggle-slider"></span>
-                </label>
-                <span><i class="fa-solid fa-moon"></i></span>
-            </div>
-            <!-- Только правильные -->
-            <div class="toggle-group">
-                <span>Все</span>
-                <label class="toggle-switch" title="Показать только правильные ответы">
-                    <input type="checkbox" id="correctOnlyToggle">
-                    <span class="toggle-slider"></span>
-                </label>
-                <div class="green-fa">
-                    <span><i class="fa-solid fa-check"></i></span>
-                </div>
-            </div>
-            <!-- Выдержки из нормативки -->
-            <div class="toggle-group">
-                <span><i class="fa-solid fa-book"></i></span>
-                <label class="toggle-switch" title="Показать выдержки из нормативки">
-                    <input type="checkbox" id="showCitationsToggle">
-                    <span class="toggle-slider"></span>
-                </label>
-                <span><i class="fa-solid fa-quote-right"></i></span>
-            </div>
-            <!-- НОВЫЙ ПЕРЕКЛЮЧАТЕЛЬ: Режим теста -->
-            <div class="toggle-group">
-                <span>Учить</span>
-                <label class="toggle-switch" title="Режим теста">
-                    <input type="checkbox" id="testModeToggle">
-                    <span class="toggle-slider"></span>
-                </label>
-                <span>Тест</span>
-            </div>
-        </div>
     </header>
 
-    <!-- ========== MAIN CONTENT ========== -->
-    <main class="main-container">
-        <!-- Ticket Navigation -->
-        <div class="ticket-nav">
-            <span class="nav-label">Билет</span>
-            <select class="ticket-select" id="ticketSelect"></select>
-            <div class="ticket-pagination" id="ticketPagination"></div>
-        </div>
+    <!-- ========== APP LAYOUT ========== -->
+    <div class="app-layout">
+        <!-- Сайдбар -->
+        <!-- <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <span>Настройки</span>
+                <button class="sidebar-close-btn" id="sidebarCloseBtn">&times;</button>
+            </div>
+            <div class="sidebar-content">
+                <div class="sidebar-item" id="sidebarTheme">
+                    <i class="fa-solid fa-sun"></i> <span>Тёмная тема</span>
+                </div>
+                <div class="sidebar-item" id="sidebarTestMode">
+                    <i class="fa-solid fa-vial"></i> <span>Режим теста</span>
+                </div>
+                <div class="sidebar-item" id="sidebarCorrectOnly">
+                    <i class="fa-solid fa-check"></i> <span>Только верные</span>
+                </div> -->
+<!-- OLD -->
+                <!-- <div class="sidebar-item" id="sidebarCitations">
+                    <i class="fa-solid fa-quote-right"></i> <span>Выдержки</span>
+                </div>
+                <hr>
+                <div class="sidebar-item" id="sidebarSound">
+                    <i class="fa-solid fa-volume-high"></i> <span>Звук</span>
+                </div>
+                <div class="sidebar-item" id="sidebarShuffle">
+                    <i class="fa-solid fa-shuffle"></i> <span>Перемешать</span>
+                </div>
+                <div class="sidebar-item" id="sidebarGrid">
+                    <i class="fa-solid fa-border-all"></i> <span>Сетка</span>
+                </div>
+                <div class="sidebar-item" id="sidebarAutoAdvance">
+                    <i class="fa-solid fa-forward"></i> <span>Автопереход</span>
+                </div> -->
+<!-- OLD -->
+                <!-- <div class="sidebar-item" id="sidebarCitations">
+                    <i class="fa-solid fa-quote-right"></i> <span>Выдержки</span>
+                </div>
+                <div id="testOptionsGroup" style="display: none;">
+                    <hr>
+                    <div class="sidebar-item" id="sidebarSound">
+                        <i class="fa-solid fa-volume-high"></i> <span>Звук</span>
+                    </div>
+                    <div class="sidebar-item" id="sidebarShuffle">
+                        <i class="fa-solid fa-shuffle"></i> <span>Перемешать</span>
+                    </div>
+                    <div class="sidebar-item" id="sidebarGrid">
+                        <i class="fa-solid fa-border-all"></i> <span>Сетка</span>
+                    </div>
+                    <div class="sidebar-item" id="sidebarAutoAdvance">
+                        <i class="fa-solid fa-forward"></i> <span>Автопереход</span>
+                    </div>
+                </div> -->
+                <!-- Скрытые чекбоксы для синхронизации с JS -->
+                <!-- <input type="checkbox" id="themeToggle" style="display:none">
+                <input type="checkbox" id="testModeToggle" style="display:none">
+                <input type="checkbox" id="correctOnlyToggle" style="display:none">
+                <input type="checkbox" id="showCitationsToggle" style="display:none">
+                <input type="checkbox" id="soundToggle" style="display:none">
+                <input type="checkbox" id="shuffleToggle" checked style="display:none">
+                <input type="checkbox" id="gridToggle" style="display:none">
+                <input type="checkbox" id="autoAdvanceToggle" style="display:none">
+            </div>
+        </aside> -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <span>Настройки</span>
+                <button class="sidebar-close-btn" id="sidebarCloseBtn">&times;</button>
+            </div>
+            <div class="sidebar-content">
+                <!-- Тема -->
+                <div class="sidebar-option">
+                    <label class="sidebar-option-label" id="sidebarThemeLabel">Тема</label>
+                    <div class="toggle-group sidebar-toggle">
+                        <span><i class="fa-solid fa-sun"></i></span>
+                        <label class="toggle-switch" title="Переключить тему">
+                            <input type="checkbox" id="sidebarThemeToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span><i class="fa-solid fa-moon"></i></span>
+                    </div>
+                </div>
+                <!-- Тест / Обучение -->
+                <div class="sidebar-option">
+                    <label class="sidebar-option-label" id="sidebarTestModeLabel">Режим обучения</label>
+                    <div class="toggle-group sidebar-toggle">
+                        <span>Учить</span>
+                        <label class="toggle-switch" title="Режим теста">
+                            <input type="checkbox" id="sidebarTestModeToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Тест</span>
+                    </div>
+                </div>
+                <!-- Только верные -->
+                <div class="sidebar-option">
+                    <label class="sidebar-option-label">Только верные ответы</label>
+                    <div class="toggle-group sidebar-toggle">
+                        <span>Все</span>
+                        <label class="toggle-switch" title="Показать только правильные ответы">
+                            <input type="checkbox" id="sidebarCorrectOnlyToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span><i class="fa-solid fa-check"></i></span>
+                    </div>
+                </div>
+                <!-- Выдержки -->
+                <div class="sidebar-option">
+                    <label class="sidebar-option-label">Выдержки из нормативки</label>
+                    <div class="toggle-group sidebar-toggle">
+                        <span><i class="fa-solid fa-book"></i></span>
+                        <label class="toggle-switch" title="Показать выдержки из нормативки">
+                            <input type="checkbox" id="sidebarCitationsToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span><i class="fa-solid fa-quote-right"></i></span>
+                    </div>
+                </div>
+                <!-- Группа тестовых опций (скрыта в обучении) -->
+                <div id="testOptionsGroup" style="display: none;">
+                    <!-- <hr> -->
+                    <!-- Звук -->
+                    <div class="sidebar-option">
+                        <label class="sidebar-option-label">Звук</label>
+                        <div class="toggle-group sidebar-toggle">
+                            <span><i class="fa-solid fa-volume-xmark"></i></span>
+                            <label class="toggle-switch" title="Звук">
+                                <input type="checkbox" id="sidebarSoundToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span><i class="fa-solid fa-volume-high"></i></span>
+                        </div>
+                    </div>
+                    <!-- Перемешать -->
+                    <div class="sidebar-option">
+                        <label class="sidebar-option-label">Перемешать вопросы и ответы</label>
+                        <div class="toggle-group sidebar-toggle">
+                            <span><i class="fa-solid fa-list-ol"></i></span>
+                            <label class="toggle-switch" title="Перемешать">
+                                <input type="checkbox" id="sidebarShuffleToggle" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span><i class="fa-solid fa-shuffle"></i></span>
+                        </div>
+                    </div>
+                    <!-- Сетка -->
+                    <div class="sidebar-option">
+                        <label class="sidebar-option-label">Сетка вопросов</label>
+                        <div class="toggle-group sidebar-toggle">
+                            <span><i class="fa-solid fa-bars"></i></span>
+                            <label class="toggle-switch" title="Сетка вопросов">
+                                <input type="checkbox" id="sidebarGridToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span><i class="fa-solid fa-border-all"></i></span>
+                        </div>
+                    </div>
+                    <!-- Автопереход -->
+                    <div class="sidebar-option">
+                        <label class="sidebar-option-label">Автопереход к следующему вопросу</label>
+                        <div class="toggle-group sidebar-toggle">
+                            <span><i class="fa-solid fa-pause"></i></span>
+                            <label class="toggle-switch" title="Автопереход">
+                                <input type="checkbox" id="sidebarAutoAdvanceToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span><i class="fa-solid fa-forward"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </aside>
 
-        <!-- Ticket Header -->
-        <div class="ticket-header">
-            <h2 class="ticket-title" id="ticketTitle">Билет 1</h2>
-            <span class="ticket-badge" id="questionCount">10 вопросов</span>
-        </div>
+        <!-- Оверлей (мобильные) -->
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
 
-        <!-- Верхний блок управления тестом (перед вопросами) -->
-        <!-- <div class="test-controls test-controls-top" id="testControlsTop" style="display: none;">
-            <button class="btn btn-sm" id="nextTicketBtn" title="Случайный билет">
-                <i class="fa-solid fa-shuffle"></i> Случайный билет
-            </button>
-            <span class="test-progress" id="questionProgress">1 / 10</span>
-            <button class="btn btn-sm btn-accent" id="finishTestBtn">
-                <i class="fa-solid fa-flag-checkered"></i> Завершить / Результаты
-            </button>
-        </div> -->
-        <!-- Верхний блок управления тестом (перед вопросами) -->
-        <div class="test-controls test-controls-top" id="testControlsTop" style="display: none;">
-            <div class="test-top-row">
-                <!-- <div class="test-top-row1"> -->
+        <!-- Основной контент -->
+        <main class="main-container">
+            <!-- Ticket Navigation -->
+            <div class="ticket-nav-div">
+                <div class="ticket-nav">
+                    <span class="nav-label">Билет</span>
+                    <select class="ticket-select" id="ticketSelect"></select>
+                    <div class="ticket-pagination" id="ticketPagination"></div>
+                </div>
+
+                <!-- Ticket Header -->
+                <div class="ticket-header">
+                    <h2 class="ticket-title" id="ticketTitle">Билет 1</h2>
+                    <span class="ticket-badge" id="questionCount">10 вопросов</span>
+                </div>
+            </div>
+            <!-- Верхний блок управления тестом -->
+            <div class="test-controls test-controls-top" id="testControlsTop" style="display: none;">
+                <div class="test-top-row">
                     <button class="btn btn-sm" id="nextTicketBtn" title="Случайный билет">
                         <i class="fa-solid fa-shuffle"></i> Случайный билет
                     </button>
                     <button class="btn btn-sm" id="randomQuestionsBtn" title="Случайные вопросы из всех билетов">
                         <i class="fa-solid fa-dice-d6"></i> Случайные вопросы
                     </button>
-                <!-- </div> -->
-                <div class="test-top-row-time">
-                    <div class="timer-display" id="timerDisplay">20:00</div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+                </div>
+                <div class="test-top-row">    
+                    <div class="test-top-row-time">
+                        <div class="timer-display" id="timerDisplay">20:00</div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+                        </div>
                     </div>
+                    <span class="test-progress" id="questionProgress">1 / 10</span>
+                    <button class="btn btn-sm btn-accent" id="finishTestBtn" style="display:none;">
+                        <i class="fa-solid fa-flag-checkered"></i> Завершить / Результаты
+                    </button>
                 </div>
-                <span class="test-progress" id="questionProgress">1 / 10</span>
-                <!-- <button class="btn btn-sm btn-accent" id="finishTestBtn" style="display:none;">
-                    <i class="fa-solid fa-flag-checkered"></i> Завершить / Результаты
-                </button> -->
             </div>
-            <!-- <div class="test-top-controls">
-                <label class="toggle-group small-toggle">
-                    <input type="checkbox" id="soundToggle"><span>Звук</span>
-                </label>
-                <label class="toggle-group small-toggle">
-                    <input type="checkbox" id="shuffleToggle" checked><span>Перемешать</span>
-                </label>
-                <label class="toggle-group small-toggle">
-                    <input type="checkbox" id="gridToggle"><span>Сетка</span>
-                </label>
-                <button class="btn btn-sm btn-accent" id="finishTestBtn" style="display:none;">
+
+            <!-- Сетка вопросов -->
+            <div id="questionGrid" class="question-grid" style="display:none;"></div>
+
+            <!-- Questions -->
+            <div class="questions-list" id="questionsList"></div>
+
+            <!-- Нижний блок управления тестом -->
+            <div class="test-controls test-controls-bottom" id="testControlsBottom" style="display: none;">
+                <button class="btn btn-sm" id="prevQuestionBtn">
+                    <i class="fa-solid fa-chevron-left"></i> Предыдущий вопрос
+                </button>
+                <button class="btn btn-sm" id="nextQuestionBtn">
+                    Следующий вопрос <i class="fa-solid fa-chevron-right"></i>
+                </button>
+                <button class="btn btn-sm btn-accent" id="finishTestBtnBottom" style="display:none;">
                     <i class="fa-solid fa-flag-checkered"></i> Завершить / Результаты
                 </button>
-            </div> -->
-            <div class="test-top-controls">
-                <!-- Звук -->
-                <div class="toggle-group small-toggle">
-                    <span><i class="fa-solid fa-volume-xmark"></i></span>
-                    <label class="toggle-switch" title="Звук">
-                        <input type="checkbox" id="soundToggle">
-                        <span class="toggle-slider"></span>
-                    </label>
-                    <span><i class="fa-solid fa-volume-high"></i></span>
-                </div>
-                <!-- Перемешать -->
-                <div class="toggle-group small-toggle">
-                    <span><i class="fa-solid fa-list-ol"></i></span>
-                    <label class="toggle-switch" title="Перемешать вопросы и ответы">
-                        <input type="checkbox" id="shuffleToggle" checked>
-                        <span class="toggle-slider"></span>
-                    </label>
-                    <span><i class="fa-solid fa-shuffle"></i></span>
-                </div>
-                <!-- Сетка -->
-                <div class="toggle-group small-toggle">
-                    <span><i class="fa-solid fa-bars"></i></span>
-                    <label class="toggle-switch" title="Сетка вопросов">
-                        <input type="checkbox" id="gridToggle">
-                        <span class="toggle-slider"></span>
-                    </label>
-                    <span><i class="fa-solid fa-border-all"></i></span>
-                </div>
-                <!-- Автопереход -->
-                <div class="toggle-group small-toggle">
-                    <span><i class="fa-solid fa-pause"></i></span>
-                    <label class="toggle-switch" title="Автопереход к следующему вопросу">
-                        <input type="checkbox" id="autoAdvanceToggle">
-                        <span class="toggle-slider"></span>
-                    </label>
-                    <span><i class="fa-solid fa-forward"></i></span>
-                </div>
-                <!-- <div class="test-top-controls2"> -->
-                <button class="btn btn-sm btn-accent" id="finishTestBtn" style="display:none;">
-                    <i class="fa-solid fa-flag-checkered"></i> Завершить / Результаты
-                </button>
-                <!-- </div> -->
             </div>
-        </div>
 
-        <!-- Questions -->
-        <div class="questions-list" id="questionsList"></div>
+            <!-- Результаты теста -->
+            <div class="test-results" id="testResults" style="display: none;"></div>
 
-        <!-- Нижний блок управления тестом (после вопросов) -->
-        <div class="test-controls test-controls-bottom" id="testControlsBottom" style="display: none;">
-            <button class="btn btn-sm" id="prevQuestionBtn">
-                <i class="fa-solid fa-chevron-left"></i> Предыдущий вопрос
-            </button>
-            <!-- <span class="test-progress" id="questionProgress">1 / 10</span> -->
-            <button class="btn btn-sm" id="nextQuestionBtn">
-                Следующий вопрос <i class="fa-solid fa-chevron-right"></i>
-            </button>
-            <!-- НОВАЯ КНОПКА -->
-            <button class="btn btn-sm btn-accent" id="finishTestBtnBottom" style="display:none;">
-                <i class="fa-solid fa-flag-checkered"></i> Завершить / Результаты
-            </button>
-            <!-- конец новой кнопки -->
-        </div>
-        <!-- Сетка вопросов -->
-        <div id="questionGrid" class="question-grid" style="display:none;"></div>
+            <!-- Empty state for search -->
+            <div class="empty-state" id="emptyState" style="display:none;">
+                <div class="empty-icon">📭</div>
+                <p>Ничего не найдено</p>
+                <small>Попробуйте изменить поисковый запрос</small>
+            </div>
+        </main>
+    </div>
 
-        <!-- Результаты теста (скрыт изначально) -->
-        <div class="test-results" id="testResults" style="display: none;"></div>
+    <!-- Кнопка "Наверх" -->
+    <button id="scrollToTopBtn" title="Наверх">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
 
-        <!-- Empty state for search -->
-        <div class="empty-state" id="emptyState" style="display:none;">
-            <div class="empty-icon">📭</div>
-            <p>Ничего не найдено</p>
-            <small>Попробуйте изменить поисковый запрос</small>
-        </div>
-    </main>
-<!-- Кнопка "Наверх" -->
-<button id="scrollToTopBtn" title="Наверх">
-    <i class="fa-solid fa-arrow-up"></i>
-</button>
-<script>
-    // Передача данных из Flask в JavaScript
-    window.TICKETS_DATA = {{ tickets_json|safe }};
-</script>
-<script src="{{ url_for('static', filename='js/main.js') }}"></script>
-<audio id="soundCorrect" preload="auto" src="{{ url_for('static', filename='sounds/correct.mp3') }}"></audio>
-<audio id="soundWrong" preload="auto" src="{{ url_for('static', filename='sounds/wrong.mp3') }}"></audio>
-<script>
-  if ('serviceWorker' in navigator) {
-    // navigator.serviceWorker.register('/static/sw.js', { scope: '/' })
-    navigator.serviceWorker.register('/sw.js', { scope: '/' })
-      .then(r => console.log('SW зарегистрирован:', r.scope))
-      .catch(e => console.error('Ошибка SW:', e));
-  }
-</script>
+    <!-- Аудио -->
+    <audio id="soundCorrect" preload="auto" src="{{ url_for('static', filename='sounds/correct.mp3') }}"></audio>
+    <audio id="soundWrong" preload="auto" src="{{ url_for('static', filename='sounds/wrong.mp3') }}"></audio>
+
+    <script>
+        // Передача данных из Flask в JavaScript
+        window.TICKETS_DATA = {{ tickets_json|safe }};
+    </script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
+          .then(r => console.log('SW зарегистрирован:', r.scope))
+          .catch(e => console.error('Ошибка SW:', e));
+      }
+    </script>
 </body>
 </html>
