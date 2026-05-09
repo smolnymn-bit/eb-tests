@@ -599,9 +599,17 @@
                                 <ul class="result-options">
                                     ${q.options.map((opt, oi) => {
                                         let cls = '';
-                                        if (opt.correct) cls = 'correct';
-                                        else if (ans && ans.selected === oi && !ans.correct) cls = 'wrong';
-                                        const marker = opt.correct ? '✓' : (ans && ans.selected === oi && !ans.correct ? '✗' : '');
+                                        let marker = '';
+                                        if (opt.correct) {
+                                            cls = 'correct';
+                                            marker = '✓';
+                                        } else if (ans && ans.selected === oi && !ans.correct) {
+                                            cls = 'wrong';
+                                            marker = '✗';
+                                        } else {
+                                            // не выбран и не правильный – просто пустой кружок
+                                            marker = '';
+                                        }
                                         return `<li class="${cls}"><span class="option-marker">${marker}</span> ${opt.text}</li>`;
                                     }).join('')}
                                 </ul>
@@ -611,13 +619,28 @@
                     }).join('')}
                 </div>
                 <div class="results-actions">
-                    <button class="btn btn-accent" id="retryTestBtn">Пройти заново</button>
-                    <button class="btn" id="newTicketBtnResult"><i class="fa-solid fa-shuffle"></i> Новый билет</button>
-                    <button class="btn" id="exitTestBtn">Выйти из теста</button>
+                    <button class="btn btn-accent" id="retryTestBtn-bottom">Пройти заново</button>
+                    <button class="btn" id="newTicketBtnResult-bottom"><i class="fa-solid fa-shuffle"></i> Новый билет</button>
+                    <button class="btn" id="exitTestBtn-bottom">Выйти из теста</button>
                 </div>
             </div>
         `;
         testResults.innerHTML = resultHTML;
+        // В finishTest(), после вставки innerHTML:
+        document.getElementById('retryTestBtn').addEventListener('click', () => startTest(testTicketIndex));
+        document.getElementById('retryTestBtn-bottom').addEventListener('click', () => startTest(testTicketIndex));
+
+        document.getElementById('newTicketBtnResult').addEventListener('click', () => loadNextRandomTicket());
+        document.getElementById('newTicketBtnResult-bottom').addEventListener('click', () => loadNextRandomTicket());
+
+        document.getElementById('exitTestBtn').addEventListener('click', () => {
+            sidebarTestModeToggle.checked = false;
+            toggleTestMode(false);
+        });
+        document.getElementById('exitTestBtn-bottom').addEventListener('click', () => {
+            sidebarTestModeToggle.checked = false;
+            toggleTestMode(false);
+        });
         document.getElementById('retryTestBtn').addEventListener('click', () => startTest(testTicketIndex));
         document.getElementById('newTicketBtnResult').addEventListener('click', () => loadNextRandomTicket());
         document.getElementById('exitTestBtn').addEventListener('click', () => {
@@ -745,13 +768,19 @@
                         }).join('')}
                     </div>
                     <div class="results-actions">
-                        <button class="btn btn-accent" id="retryTestBtn">Пройти заново</button>
-                        <button class="btn" id="newTicketBtnResult"><i class="fa-solid fa-shuffle"></i> Новый билет</button>
-                        <button class="btn" id="exitTestBtn">Выйти из теста</button>
+                        <button class="btn btn-accent" id="retryTestBtn-bottom">Пройти заново</button>
+                        <button class="btn" id="newTicketBtnResult-bottom"><i class="fa-solid fa-shuffle"></i> Новый билет</button>
+                        <button class="btn" id="exitTestBtn-bottom">Выйти из теста</button>
                     </div>
                 </div>
             `;
             testResults.innerHTML = resultHTML;
+            document.getElementById('retryTestBtn-bottom').addEventListener('click', () => startTest(testTicketIndex));
+            document.getElementById('newTicketBtnResult-bottom').addEventListener('click', () => loadNextRandomTicket());
+            document.getElementById('exitTestBtn-bottom').addEventListener('click', () => {
+                sidebarTestModeToggle.checked = false;
+                toggleTestMode(false);
+            });
             document.getElementById('retryTestBtn').addEventListener('click', () => startTest(testTicketIndex));
             document.getElementById('newTicketBtnResult').addEventListener('click', () => loadNextRandomTicket());
             document.getElementById('exitTestBtn').addEventListener('click', () => {
@@ -781,7 +810,19 @@
         localStorage.setItem('eb-sound', soundEnabled ? '1' : '0');
         updateSidebarUI();
     });
+    // sidebarShuffleToggle.addEventListener('change', () => {
+    //     if (testMode) {
+    //         if (isRandomMode) {
+    //             startTest(0, { randomQuestions: true, questionCount: testAnswers.length });
+    //         } else {
+    //             startTest(testTicketIndex);
+    //         }
+    //     }
+    //     updateSidebarUI();
+    // });
     sidebarShuffleToggle.addEventListener('change', () => {
+        const checked = sidebarShuffleToggle.checked;
+        localStorage.setItem('eb-shuffle', checked ? '1' : '0');
         if (testMode) {
             if (isRandomMode) {
                 startTest(0, { randomQuestions: true, questionCount: testAnswers.length });
@@ -791,13 +832,29 @@
         }
         updateSidebarUI();
     });
+    // sidebarGridToggle.addEventListener('change', () => {
+    //     questionGrid.style.display = sidebarGridToggle.checked ? 'flex' : 'none';
+    //     if (sidebarGridToggle.checked) buildQuestionGrid();
+    //     updateSidebarUI();
+    // });
     sidebarGridToggle.addEventListener('change', () => {
-        questionGrid.style.display = sidebarGridToggle.checked ? 'flex' : 'none';
-        if (sidebarGridToggle.checked) buildQuestionGrid();
+        const checked = sidebarGridToggle.checked;
+        localStorage.setItem('eb-grid', checked ? '1' : '0');
+        questionGrid.style.display = checked ? 'flex' : 'none';
+        if (checked) buildQuestionGrid();
         updateSidebarUI();
     });
+    // sidebarAutoAdvanceToggle.addEventListener('change', () => {
+    //     autoAdvance = sidebarAutoAdvanceToggle.checked;
+    //     if (!autoAdvance && autoAdvanceTimeout) {
+    //         clearTimeout(autoAdvanceTimeout);
+    //         autoAdvanceTimeout = null;
+    //     }
+    //     updateSidebarUI();
+    // });
     sidebarAutoAdvanceToggle.addEventListener('change', () => {
         autoAdvance = sidebarAutoAdvanceToggle.checked;
+        localStorage.setItem('eb-auto-advance', autoAdvance ? '1' : '0');
         if (!autoAdvance && autoAdvanceTimeout) {
             clearTimeout(autoAdvanceTimeout);
             autoAdvanceTimeout = null;
@@ -855,9 +912,48 @@
         // if (savedTheme === 'dark') applyTheme(true);
         // else if (savedTheme === 'light') applyTheme(false);
         // else applyTheme(window.matchMedia('(prefers-color-scheme: dark)').matches);
+        // correctOnly = localStorage.getItem('eb-correct-only') === '1';
+        // showCitations = localStorage.getItem('eb-show-citations') === '1';
+        // soundEnabled = localStorage.getItem('eb-sound') === '1';
         correctOnly = localStorage.getItem('eb-correct-only') === '1';
-        showCitations = localStorage.getItem('eb-show-citations') === '1';
-        soundEnabled = localStorage.getItem('eb-sound') === '1';
+
+        // Выдержки из нормативки: по умолчанию ВКЛ
+        if (localStorage.getItem('eb-show-citations') === null) {
+            showCitations = true;
+            localStorage.setItem('eb-show-citations', '1');
+        } else {
+            showCitations = localStorage.getItem('eb-show-citations') === '1';
+        }
+
+        // Звук: по умолчанию ВКЛ
+        if (localStorage.getItem('eb-sound') === null) {
+            soundEnabled = true;
+            localStorage.setItem('eb-sound', '1');
+        } else {
+            soundEnabled = localStorage.getItem('eb-sound') === '1';
+        }
+
+        // Перемешивание вопросов: по умолчанию ВКЛ
+        if (localStorage.getItem('eb-shuffle') === null) {
+            localStorage.setItem('eb-shuffle', '1');
+        }
+        const shuffleEnabled = localStorage.getItem('eb-shuffle') === '1';
+        if (sidebarShuffleToggle) sidebarShuffleToggle.checked = shuffleEnabled;
+
+        // Сетка вопросов: по умолчанию ВКЛ
+        if (localStorage.getItem('eb-grid') === null) {
+            localStorage.setItem('eb-grid', '1');
+        }
+        const gridEnabled = localStorage.getItem('eb-grid') === '1';
+        if (sidebarGridToggle) sidebarGridToggle.checked = gridEnabled;
+
+        // Автопереход: по умолчанию ВКЛ
+        if (localStorage.getItem('eb-auto-advance') === null) {
+            localStorage.setItem('eb-auto-advance', '1');
+            autoAdvance = true;
+        } else {
+            autoAdvance = localStorage.getItem('eb-auto-advance') === '1';
+        }
         populateTicketSelect();
         let startIndex = 0;
         const hash = window.location.hash;
