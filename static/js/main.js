@@ -414,6 +414,15 @@
         updateSidebarUI();
     }
 
+    // function toggleTestModeUI(enable) {
+    //     testControlsTop.style.display = enable ? 'flex' : 'none';
+    //     testControlsBottom.style.display = enable ? 'flex' : 'none';
+    //     questionGrid.style.display = 'none';
+    //     if (!enable) stopTimer();
+    //     testResults.style.display = 'none';
+    //     ticketPagination.style.display = enable ? 'none' : '';
+    //     testTicketData = enable ? testTicketData : null;
+    // }
     function toggleTestModeUI(enable) {
         testControlsTop.style.display = enable ? 'flex' : 'none';
         testControlsBottom.style.display = enable ? 'flex' : 'none';
@@ -421,11 +430,14 @@
         if (!enable) stopTimer();
         testResults.style.display = 'none';
         ticketPagination.style.display = enable ? 'none' : '';
+        questionsList.style.display = enable ? '' : 'none';   // ← добавить
+        emptyState.style.display = 'none';                     // ← добавить
         testTicketData = enable ? testTicketData : null;
     }
 
     function startTest(ticketIndex, options = {}) {
         const { randomQuestions = false, questionCount = 20 } = options;
+        toggleTestModeUI(true);
         isRandomMode = randomQuestions;
         citationsAutoShown = false;  // сбрасываем флаг авто‑показа выдержек
         let questions, ticketId;
@@ -569,6 +581,11 @@
                     <div class="stat wrong" data-category="wrong"><span class="stat-num">${wrongCount}</span> неправильно</div>
                     <div class="stat unanswered" data-category="unanswered"><span class="stat-num">${unansweredCount}</span> без ответа</div>
                 </div>
+                <div class="results-actions">
+                    <button class="btn btn-accent" id="retryTestBtn">Пройти заново</button>
+                    <button class="btn" id="newTicketBtnResult"><i class="fa-solid fa-shuffle"></i> Новый билет</button>
+                    <button class="btn" id="exitTestBtn">Выйти из теста</button>
+                </div>
                 <div class="results-details">
                     <h3>Детализация:</h3>
                     ${ticket.questions.map((q, i) => {
@@ -624,9 +641,22 @@
         updateSidebarUI();
     }
 
+    // function loadNextRandomTicket() {
+    //     let newIndex;
+    //     do { newIndex = Math.floor(Math.random() * TICKETS_DATA.length); } while (TICKETS_DATA.length > 1 && newIndex === testTicketIndex);
+    //     startTest(newIndex);
+    // }
     function loadNextRandomTicket() {
+        if (TICKETS_DATA.length === 0) return;
         let newIndex;
-        do { newIndex = Math.floor(Math.random() * TICKETS_DATA.length); } while (TICKETS_DATA.length > 1 && newIndex === testTicketIndex);
+        if (TICKETS_DATA.length === 1) {
+            newIndex = 0; // единственный билет
+        } else {
+            // Выбираем случайный билет, исключая текущий
+            do {
+                newIndex = Math.floor(Math.random() * TICKETS_DATA.length);
+            } while (newIndex === testTicketIndex);
+        }
         startTest(newIndex);
     }
 
