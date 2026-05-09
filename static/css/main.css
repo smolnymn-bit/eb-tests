@@ -3,6 +3,7 @@
     --bg-secondary: #f5f7fa;
     --text: #1a1a2e;
     --text-secondary: #4a5568;
+    --text-sb: #ffffff;
     --accent: #0096d6;
     --accent-hover: #007ab8;
     --accent-light: #e6f4fb;
@@ -99,20 +100,23 @@ body {
 
 /* ========== HEADER ========== */
 .header {
-    background: var(--nav-bg);
+    background: #1e293b73;
+    /* border-right: 1px solid var(--divider); */
+    backdrop-filter: blur(6px) saturate(1.5);
+    /* background: var(--nav-bg); */
     border-bottom: 1px solid var(--divider);
     padding: 0 1.5rem;
     min-height: 56px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    /* justify-content: space-between; */
     flex-wrap: wrap;
     gap: 0.75rem;
     position: sticky;
     top: 0;
     z-index: 100;
     backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    /* -webkit-backdrop-filter: blur(12px); */
     transition: all 0.4s ease;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 }
@@ -356,12 +360,20 @@ input:checked + .toggle-slider::before {
 }
 
 /* ========== TICKET NAVIGATION ========== */
+.ticket-nav-div {
+    display: flex;
+    align-items: center;
+    align-content: center;
+    justify-content: space-between;
+    flex-direction: row-reverse;
+}
 .ticket-nav {
     display: flex;
     align-items: center;
     gap: 0.5rem;
     margin-bottom: 1.25rem;
     flex-wrap: wrap;
+    justify-content: flex-end;
 }
 .nav-label {
     font-weight: 600;
@@ -437,7 +449,7 @@ input:checked + .toggle-slider::before {
 .ticket-header {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 0.5rem;
     margin-bottom: 1.5rem;
     flex-wrap: wrap;
 }
@@ -637,19 +649,12 @@ input:checked + .toggle-slider::before {
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    margin: 0px 0px 10px 0px;
+    margin: 0px 0px 8px 0px;
     padding: 0.75rem 0.5rem;
     background: var(--bg-secondary);
     border-radius: 12px;
     flex-wrap: wrap;
 }
-/* .test-controls {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    margin: 12px 0;
-} */
 .test-progress {
     font-weight: 600;
     font-size: 0.9rem;
@@ -931,13 +936,13 @@ button#nextTicketBtn {
 }
 
 .test-controls .btn {
-    flex: 1 1 0;               /* кнопки делят доступное пространство поровну */
-    min-width: 0;              /* чтобы текст мог переноситься */
+    flex: 1 1 0;
+    min-width: 0;
     white-space: normal;
     text-align: center;
 }
 div#testControlsBottom {
-    margin-top: 10px;
+    margin-top: 8px;
 }
 
 /* Выдержка из нормативки */
@@ -961,11 +966,180 @@ div#testControlsBottom {
 .citation-text {
     line-height: 1.5;
 }
+/* Тумблеры в сайдбаре */
+.sidebar-toggle {
+    border: solid 1px var(--toggle-bg);
+    padding: 8px 16px;
+    margin: 4px 0px;
+    font-size: 0.85rem;
+    justify-content: space-between;
+    background: var(--bg-secondary);
+}
+.sidebar-toggle .toggle-switch {
+    width: 36px;
+    height: 20px;
+}
+.sidebar-toggle .toggle-slider::before {
+    height: 14px;
+    width: 14px;
+    left: 2px;
+    bottom: 3px;
+}
+input:checked + .toggle-slider::before {
+    transform: translateX(16px);
+}
+/* Заблокированные тумблеры в сайдбаре */
+.toggle-group.sidebar-toggle.disabled-override {
+    opacity: 0.4;
+    pointer-events: none;
+}
+/* Подписи к опциям в сайдбаре */
+.sidebar-option {
+    margin-bottom: 12px;
+}
+.sidebar-option-label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-sb);
+    margin-bottom: 4px;
+    letter-spacing: 0.02em;
+}
+/* ========== APP LAYOUT (сайдбар) ========== */
+.app-layout {
+    display: flex;
+    min-height: calc(100vh - 56px);
+}
 
+/* ========== SIDEBAR & BURGER ========== */
+.burger-btn {
+    background: none;
+    border: none;
+    color: var(--text);
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    margin-right: 0.5rem;
+    display: none;            /* скрыт на десктопах */
+    align-items: center;
+}
+.sidebar {
+    min-width: 240px;
+    max-width: 240px;
+    background: #1e293b73;
+    border-right: 1px solid var(--divider);
+    backdrop-filter: blur(6px) saturate(1.5);
+    padding: 1rem 1.5rem;
+    transition: left 0.3s ease;
+    overflow-y: auto;
+    z-index: 1000;
+    position: sticky;
+    top: 56px;
+    align-self: flex-start;
+    height: calc(100vh - 56px);
+}
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 0.5rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    color: var(--text-sb);
+}
+.sidebar-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-sb);
+    display: none;            /* видна только на мобильных */
+}
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.8rem;
+    margin: 0.2rem 0;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.sidebar-item:hover {
+    background: var(--accent-light);
+}
+
+.sidebar-item.active {
+    background: var(--accent-light);
+    color: var(--accent);
+    font-weight: 600;
+}
+
+.sidebar-item.active i {
+    color: var(--accent);
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 999;
+}
+
+/* Мобильные */
+@media (max-width: 768px) {
+    .app-layout {
+        display: block;
+    }
+    .burger-btn {
+        display: flex;
+    }
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: -280px;
+        width: 280px;
+        height: 100%;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    }
+    .sidebar.open {
+        left: 0;
+    }
+    .sidebar-close-btn {
+        display: block;
+    }
+    .sidebar-overlay.show {
+        display: block;
+    }
+    .header-search {
+        order: 3;
+        width: 100%;
+    }
+}
 /* Удалите или закомментируйте устаревшие .single-btn, если были */
 
 /*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  */
-
+@media (max-width: 768px) {
+  .header-controls .toggle-group {
+    display: none;   /* спрятать все тумблеры */
+  }
+  .header-controls .toggle-group.hidden-placeholder {
+    display: none;
+  }
+  .burger-btn {
+    display: flex;   /* показываем бургер */
+  }
+}
+/* На мобильных устройствах скрытые тумблеры полностью исчезают, не сохраняя место */
+@media (max-width: 768px) {
+    .toggle-group.hidden-placeholder {
+        display: none !important;
+    }
+}
 /* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
     .header {
