@@ -1,5 +1,5 @@
 :root {
-    --bg: #ffffff;
+    --bg: #f0f4ff;
     --bg-secondary: #f5f7fa;
     --text: #1a1a2e;
     --text-secondary: #4a5568;
@@ -115,7 +115,6 @@ body {
     position: sticky;
     top: 0;
     z-index: 100;
-    backdrop-filter: blur(12px);
     /* -webkit-backdrop-filter: blur(12px); */
     transition: all 0.4s ease;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
@@ -717,12 +716,14 @@ input:checked + .toggle-slider::before {
     flex-wrap: wrap;
 }
 .stat {
-    display: flex;
+display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 1rem 1.5rem;
+    padding: 0.8rem 0.5rem;
     border-radius: 12px;
     background: var(--bg-secondary);
+    width: 120PX;
+    margin-bottom: -10px;
 }
 .stat.correct {
     background: var(--correct-bg);
@@ -737,9 +738,9 @@ input:checked + .toggle-slider::before {
     color: #64748b;
 }
 .stat-num {
-    font-size: 2rem;
+    font-size: 1.4rem;
     font-weight: 800;
-    line-height: 1;
+    line-height: 0.5;
 }
 .results-details {
     margin-top: 1.5rem;
@@ -1019,7 +1020,7 @@ input:checked + .toggle-slider::before {
     font-size: 1.5rem;
     cursor: pointer;
     padding: 0.25rem;
-    margin-right: 0.5rem;
+    margin: 0 0 0 auto;
     display: none;            /* скрыт на десктопах */
     align-items: center;
 }
@@ -1207,7 +1208,7 @@ input:checked + .toggle-slider::before {
     }
     .ticket-select {
         font-size: 0.8rem;
-        padding: 0.4rem 1.5rem 0.4rem 0.5rem;
+        padding: 0.3rem 1.5rem 0.3rem 0.5rem;
         min-width: 100px;
     }
     .page-btn {
@@ -1310,7 +1311,7 @@ input:checked + .toggle-slider::before {
 .stat {
     cursor: pointer;
     transition: all 0.2s;
-    border: 2px solid transparent;
+    border: 2px solid;
 }
 .stat.active {
     border-color: var(--accent);
