@@ -171,6 +171,17 @@
                             <span><i class="fa-solid fa-volume-high"></i></span>
                         </div>
                     </div>
+                    <div class="sidebar-option">
+                        <label class="sidebar-option-label">Мелодия</label>
+                        <div class="toggle-group sidebar-toggle">
+                            <span>1</span>
+                            <label class="toggle-switch" title="Переключить набор звуков">
+                                <input type="checkbox" id="sidebarSoundSetToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span>2</span>
+                        </div>
+                    </div>
                     <!-- Перемешать -->
                     <div class="sidebar-option">
                         <label class="sidebar-option-label">Перемешать вопросы и ответы</label>
@@ -205,6 +216,18 @@
                                 <span class="toggle-slider"></span>
                             </label>
                             <span><i class="fa-solid fa-forward"></i></span>
+                        </div>
+                    </div>
+                    <!-- Таймер билета -->
+                    <div class="sidebar-option">
+                        <label class="sidebar-option-label">Таймер на билет (10 вопросов)</label>
+                        <div class="toggle-group sidebar-toggle">
+                            <span>10 мин</span>
+                            <label class="toggle-switch" title="Выбор таймера">
+                                <input type="checkbox" id="sidebarTimerToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span>20 мин</span>
                         </div>
                     </div>
                 </div>
@@ -282,6 +305,31 @@
                 <p>Ничего не найдено</p>
                 <small>Попробуйте изменить поисковый запрос</small>
             </div>
+            <!-- Модальное окно случайных вопросов -->
+            <div class="modal-overlay" id="randomModal" style="display:none;">
+            <div class="modal">
+                <div class="modal-header">
+                <h3>Случайные вопросы</h3>
+                <button class="modal-close-btn" id="modalCloseBtn">&times;</button>
+                </div>
+                <div class="modal-body">
+                <label for="randomQuestionCount">Количество вопросов:</label>
+                <select id="randomQuestionCount" class="modal-select">
+                    <option value="10">10</option>
+                    <option value="20" selected>20</option>
+                    <option value="30">30</option>
+                    <option value="40">40</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="all">Все</option>
+                </select>
+                <div class="modal-actions">
+                    <button class="btn btn-accent" id="modalStartBtn">Начать тест</button>
+                    <button class="btn" id="modalCancelBtn">Отмена</button>
+                </div>
+                </div>
+            </div>
+            </div>
         </main>
     </div>
 
@@ -291,9 +339,24 @@
     </button>
 
     <!-- Аудио -->
+     <!-- Контейнер для анимации фейерверка -->
+    <div id="fireworksContainer"></div>
     <audio id="soundCorrect" preload="auto" src="{{ url_for('static', filename='sounds/correct.mp3') }}"></audio>
     <audio id="soundWrong" preload="auto" src="{{ url_for('static', filename='sounds/wrong.mp3') }}"></audio>
-
+    <audio id="soundCorrect" preload="auto" src="{{ url_for('static', filename='sounds/correct_1.mp3') }}"></audio>
+    <audio id="soundWrong" preload="auto" src="{{ url_for('static', filename='sounds/wrong_1.mp3') }}"></audio>
+    <audio id="soundVictory" preload="auto" src="{{ url_for('static', filename='sounds/victory.mp3') }}"></audio>
+    <audio id="soundVictory" preload="auto" src="{{ url_for('static', filename='sounds/victory_1.mp3') }}"></audio>
+    <script>
+        // Пути к двум наборам звуков
+        window.SOUND_CORRECT_1 = "{{ url_for('static', filename='sounds/correct_1.mp3') }}";
+        window.SOUND_WRONG_1   = "{{ url_for('static', filename='sounds/wrong_1.mp3') }}";
+        window.SOUND_CORRECT_2 = "{{ url_for('static', filename='sounds/correct.mp3') }}";
+        window.SOUND_WRONG_2   = "{{ url_for('static', filename='sounds/wrong.mp3') }}";
+        window.SOUND_VICTORY_1 = "{{ url_for('static', filename='sounds/victory.mp3') }}";
+        window.SOUND_VICTORY_2 = "{{ url_for('static', filename='sounds/victory_1.mp3') }}";
+    </script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script>
         // Передача данных из Flask в JavaScript
         window.TICKETS_DATA = {{ tickets_json|safe }};
