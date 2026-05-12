@@ -12,6 +12,7 @@
     let testTicketData = null;
     let isRandomMode = false;
     let soundEnabled = false;
+    let soundSet = 1;
     let autoAdvance = false;
     let autoAdvanceTimeout = null;
     let timerInterval = null;
@@ -19,6 +20,9 @@
     let timerEndTime = null;
     let citationsAutoShown = false;   // предотвращает повторное авто‑включение выдержек
     let isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark';
+
+    let timerOption = 'short'; // 'short' = 10 мин на билет, 'long' = 20 мин
+    const sidebarTimerToggle = document.getElementById('sidebarTimerToggle');
 
     // DOM refs (основные)
     const $ = (s) => document.querySelector(s);
@@ -47,6 +51,8 @@
     const questionGrid = $('#questionGrid');
     const randomQuestionsBtn = $('#randomQuestionsBtn');
 
+    const victoryAudio = document.getElementById('soundVictory');
+
     // Сайдбар
     const burgerBtn = document.getElementById('burgerBtn');
     const sidebar = document.getElementById('sidebar');
@@ -57,6 +63,7 @@
     const sidebarCorrectOnlyToggle = document.getElementById('sidebarCorrectOnlyToggle');
     const sidebarCitationsToggle = document.getElementById('sidebarCitationsToggle');
     const sidebarSoundToggle = document.getElementById('sidebarSoundToggle');
+    const sidebarSoundSetToggle = document.getElementById('sidebarSoundSetToggle');
     const sidebarShuffleToggle = document.getElementById('sidebarShuffleToggle');
     const sidebarGridToggle = document.getElementById('sidebarGridToggle');
     const sidebarAutoAdvanceToggle = document.getElementById('sidebarAutoAdvanceToggle');
@@ -105,6 +112,53 @@
         searchDropdown.style.display = 'block';
     }
     function hideDropdown() { searchDropdown.style.display = 'none'; }
+    // ===== ИСТОРИЯ НЕПОВТОРЕНИЯ =====
+    let usedTickets = [];
+    let usedQuestions = [];
+
+    function loadUsedData() {
+        try {
+            usedTickets = JSON.parse(localStorage.getItem('eb-used-tickets') || '[]');
+            usedQuestions = JSON.parse(localStorage.getItem('eb-used-questions') || '[]');
+        } catch(e) {
+            usedTickets = [];
+            usedQuestions = [];
+        }
+    }
+    function saveUsedData() {
+        localStorage.setItem('eb-used-tickets', JSON.stringify(usedTickets));
+        localStorage.setItem('eb-used-questions', JSON.stringify(usedQuestions));
+    }
+    function addUsedTicket(ticketId) {
+        if (!usedTickets.includes(ticketId)) {
+            usedTickets.push(ticketId);
+            saveUsedData();
+        }
+    }
+    function addUsedQuestions(questionKeys) {
+        let changed = false;
+        questionKeys.forEach(key => {
+            if (!usedQuestions.includes(key)) {
+                usedQuestions.push(key);
+                changed = true;
+            }
+        });
+        if (changed) saveUsedData();
+    }
+    function getUnusedRandomTicketIndex() {
+        if (TICKETS_DATA.length === 0) return 0;
+        const unusedIndexes = TICKETS_DATA.reduce((arr, ticket, idx) => {
+            if (!usedTickets.includes(ticket.id)) arr.push(idx);
+            return arr;
+        }, []);
+        if (unusedIndexes.length === 0) {
+            usedTickets = [];
+            saveUsedData();
+            alert('Все билеты пройдены, начинаем заново.');
+            return Math.floor(Math.random() * TICKETS_DATA.length);
+        }
+        return unusedIndexes[Math.floor(Math.random() * unusedIndexes.length)];
+    }
     function shuffleArray(arr) {
         for (let i = arr.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -118,6 +172,97 @@
             const audio = document.getElementById(audioId);
             if (audio) { audio.currentTime = 0; audio.play().catch(e => {}); }
         } catch(e) {}
+    }
+    function launchFireworks() {
+        const container = document.getElementById('fireworksContainer');
+        if (!container) return;
+        
+        // Очищаем контейнер от предыдущих частиц
+        container.innerHTML = '';
+        
+        const colors = [
+            '#ff4d4d', '#ffb84d', '#ffe74d', '#4dff4d', '#4db8ff', 
+            '#b84dff', '#ff4db8', '#ff6b6b', '#ffd93d', '#6bcb77',
+            '#4d96ff', '#ff922b', '#20c997', '#ff6b9d'
+        ];
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+        const particleCount = 40; // больше частиц
+        const waves = 6;          // 6 волн
+        const waveDelay = 700;    // 700 мс между волнами (5*700=3500 мс + 1500 мс анимации = 5 сек)
+        
+        for (let w = 0; w < waves; w++) {
+            setTimeout(() => {
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'firework-particle';
+                    
+                    // Размер от 8 до 24px
+                    const size = Math.random() * 16 + 8;
+                    particle.style.width = size + 'px';
+                    particle.style.height = size + 'px';
+                    particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    particle.style.left = centerX + 'px';
+                    particle.style.top = centerY + 'px';
+                    
+                    // Случайный угол и дальность полёта
+                    const angle = Math.random() * 2 * Math.PI;
+                    const distance = Math.random() * 250 + 150; // 150–400px
+                    const tx = Math.cos(angle) * distance;
+                    const ty = Math.sin(angle) * distance;
+                    // Конечная точка – ещё дальше
+                    const tx2 = Math.cos(angle) * (distance + 120);
+                    const ty2 = Math.sin(angle) * (distance + 120);
+                    
+                    particle.style.setProperty('--tx', tx + 'px');
+                    particle.style.setProperty('--ty', ty + 'px');
+                    particle.style.setProperty('--tx2', tx2 + 'px');
+                    particle.style.setProperty('--ty2', ty2 + 'px');
+                    
+                    container.appendChild(particle);
+                    
+                    // Удаляем частицу после завершения анимации
+                    particle.addEventListener('animationend', () => {
+                        particle.remove();
+                    });
+                }
+            }, w * waveDelay);
+        }
+    }
+    // function updateSoundSources() {
+    //     const correctAudio = document.getElementById('soundCorrect');
+    //     const wrongAudio   = document.getElementById('soundWrong');
+    //     if (!correctAudio || !wrongAudio) return;
+
+    //     if (soundSet === 2) {
+    //         correctAudio.src = window.SOUND_CORRECT_2;
+    //         wrongAudio.src   = window.SOUND_WRONG_2;
+    //     } else {
+    //         correctAudio.src = window.SOUND_CORRECT_1;
+    //         wrongAudio.src   = window.SOUND_WRONG_1;
+    //     }
+    //     // Перезагружаем аудиоэлементы, чтобы применить новый источник
+    //     correctAudio.load();
+    //     wrongAudio.load();
+    // }
+    function updateSoundSources() {
+        const correctAudio = document.getElementById('soundCorrect');
+        const wrongAudio   = document.getElementById('soundWrong');
+        const victoryAudio = document.getElementById('soundVictory'); // уже объявлен глобально, но здесь используем локально, если глобальный не виден – можно обратиться по id
+
+        if (soundSet === 2) {
+            correctAudio.src = window.SOUND_CORRECT_2;
+            wrongAudio.src   = window.SOUND_WRONG_2;
+            if (victoryAudio) victoryAudio.src = window.SOUND_VICTORY_2;
+        } else {
+            correctAudio.src = window.SOUND_CORRECT_1;
+            wrongAudio.src   = window.SOUND_WRONG_1;
+            if (victoryAudio) victoryAudio.src = window.SOUND_VICTORY_1;
+        }
+        // Перезагружаем аудиоэлементы
+        correctAudio.load();
+        wrongAudio.load();
+        if (victoryAudio) victoryAudio.load();
     }
 
     // RENDER
@@ -264,17 +409,43 @@
             opt.textContent = `№ ${ticket.id}`;
             ticketSelect.appendChild(opt);
         });
+        // ticketSelect.addEventListener('change', () => {
+        //     const idx = parseInt(ticketSelect.value);
+        //     if (testMode) startTest(idx);
+        //     else navigateToTicket(idx, searchQuery);
+        // });
         ticketSelect.addEventListener('change', () => {
             const idx = parseInt(ticketSelect.value);
+            // проверяем, что индекс корректный
+            if (isNaN(idx) || idx < 0 || idx >= TICKETS_DATA.length) return;
             if (testMode) startTest(idx);
             else navigateToTicket(idx, searchQuery);
         });
     }
 
     // Таймер
-    function startTimer() {
+    // function startTimer() {
+    //     stopTimer();
+    //     const durationMs = 20 * 60 * 1000;
+    //     timerEndTime = Date.now() + durationMs;
+    //     timerSeconds = Math.ceil((timerEndTime - Date.now()) / 1000);
+    //     updateTimerDisplay();
+    //     timerInterval = setInterval(() => {
+    //         const remaining = timerEndTime - Date.now();
+    //         if (remaining <= 0) {
+    //             timerSeconds = 0;
+    //             updateTimerDisplay();
+    //             stopTimer();
+    //             finishTest();
+    //             return;
+    //         }
+    //         timerSeconds = Math.ceil(remaining / 1000);
+    //         updateTimerDisplay();
+    //     }, 1000);
+    // }
+    function startTimer(durationSec) {
         stopTimer();
-        const durationMs = 20 * 60 * 1000;
+        const durationMs = durationSec * 1000;
         timerEndTime = Date.now() + durationMs;
         timerSeconds = Math.ceil((timerEndTime - Date.now()) / 1000);
         updateTimerDisplay();
@@ -436,23 +607,48 @@
     }
 
     function startTest(ticketIndex, options = {}) {
+        // fallback, если индекс невалидный
+        if (isNaN(ticketIndex) || ticketIndex < 0 || ticketIndex >= TICKETS_DATA.length) {
+            if (TICKETS_DATA.length === 0) return;   // совсем нет билетов – выходим без звука
+            ticketIndex = 0;                         // иначе берём первый билет
+        }
+        ///////////////////////////////////
         const { randomQuestions = false, questionCount = 20 } = options;
+        const count = questionCount;
         toggleTestModeUI(true);
         isRandomMode = randomQuestions;
         citationsAutoShown = false;  // сбрасываем флаг авто‑показа выдержек
         let questions, ticketId;
         if (randomQuestions) {
+            // const allQuestions = [];
+            // TICKETS_DATA.forEach(ticket => {
+            //     ticket.questions.forEach(q => allQuestions.push({ ...q, ticketId: ticket.id }));
+            // });
+            // const count = Math.min(questionCount, allQuestions.length);
+            // const selected = [];
+            // const used = new Set();
+            // while (selected.length < count) {
+            //     const idx = Math.floor(Math.random() * allQuestions.length);
+            //     if (!used.has(idx)) { used.add(idx); selected.push(allQuestions[idx]); }
+            // }
+            // questions = selected;
             const allQuestions = [];
             TICKETS_DATA.forEach(ticket => {
-                ticket.questions.forEach(q => allQuestions.push({ ...q, ticketId: ticket.id }));
+                ticket.questions.forEach((q, qIdx) => {
+                    allQuestions.push({ ...q, ticketId: ticket.id, questionKey: `${ticket.id}-${qIdx}` });
+                });
             });
-            const count = Math.min(questionCount, allQuestions.length);
-            const selected = [];
-            const used = new Set();
-            while (selected.length < count) {
-                const idx = Math.floor(Math.random() * allQuestions.length);
-                if (!used.has(idx)) { used.add(idx); selected.push(allQuestions[idx]); }
+            let available = allQuestions.filter(q => !usedQuestions.includes(q.questionKey));
+            if (available.length < count) {
+                usedQuestions = [];
+                saveUsedData();
+                available = allQuestions;
+                alert('Все вопросы пройдены, начинаем заново.');
             }
+            const shuffled = [...available];
+            shuffleArray(shuffled);
+            const selected = shuffled.slice(0, count);
+            addUsedQuestions(selected.map(q => q.questionKey));
             questions = selected;
             ticketId = '?';
         } else {
@@ -460,20 +656,48 @@
             questions = ticket.questions.map(q => ({ ...q }));
             ticketId = ticket.id;
         }
+        // } else {
+        //     if (ticketIndex < 0 || ticketIndex >= TICKETS_DATA.length) {
+        //         // fallback – берём первый доступный билет или выходим
+        //         if (TICKETS_DATA.length === 0) {
+        //             alert('Нет билетов для теста');
+        //             toggleTestModeUI(false);
+        //             return;
+        //         }
+        //         ticketIndex = 0;
+        //     }
+        //     const ticket = TICKETS_DATA[ticketIndex];
+        //     questions = ticket.questions.map(q => ({ ...q }));
+        //     ticketId = ticket.id;
+        // }
         if (sidebarShuffleToggle && sidebarShuffleToggle.checked) {
             shuffleArray(questions);
             questions = questions.map(q => { const opts = [...q.options]; shuffleArray(opts); return { ...q, options: opts }; });
         }
         testTicketData = { id: ticketId, questions };
         testTicketIndex = ticketIndex;
+        // if (!randomQuestions) {
+        //     addUsedTicket(ticket.id);
+        // }
+        if (!randomQuestions) {
+            addUsedTicket(ticketId);
+        }
         testQuestionIndex = 0;
         testAnswers = new Array(questions.length).fill(null);
         ticketSelect.disabled = randomQuestions;
         if (!randomQuestions) ticketSelect.value = ticketIndex;
         ticketTitle.textContent = `${randomQuestions ? 'Случайные вопросы' : `Билет ${ticketId}`} (тест)`;
         questionCount.textContent = `${questions.length} вопросов`;
-        timerDisplay.style.display = randomQuestions ? 'none' : '';
-        if (!randomQuestions) startTimer(); else stopTimer();
+        // timerDisplay.style.display = randomQuestions ? 'none' : '';
+        // if (!randomQuestions) startTimer(); else stopTimer();
+        if (randomQuestions) {
+            // Таймер из расчёта 1 минута на вопрос
+            const totalMinutes = Math.ceil(questions.length / 10) * 10; // кратно 10 минутам, минимум 10
+            startTimer(totalMinutes * 60);
+        } else {
+            const durationSec = timerOption === 'short' ? 10 * 60 : 20 * 60;
+            startTimer(durationSec);
+        }
         renderTestQuestion();
         buildQuestionGrid();
         updateSidebarUI();
@@ -549,7 +773,137 @@
         }
     }
 
+    // function finishTest() {
+    //     const ticket = testTicketData;
+    //     const total = ticket.questions.length;
+    //     const correctCount = testAnswers.filter(a => a && a.correct).length;
+    //     const wrongCount = testAnswers.filter(a => a && !a.correct).length;
+    //     const unansweredCount = testAnswers.filter(a => a === null).length;
+    //     questionsList.style.display = 'none';
+    //     testControlsTop.style.display = 'none';
+    //     testControlsBottom.style.display = 'none';
+    //     stopTimer();
+    //     if (autoAdvanceTimeout) { clearTimeout(autoAdvanceTimeout); autoAdvanceTimeout = null; }
+    //     questionGrid.style.display = 'none';
+    //     ticketSelect.disabled = false;
+    //     testResults.style.display = 'block';
+
+    //     // Автоматически включаем выдержки только один раз за тест
+    //     if (!citationsAutoShown) {
+    //         if (!showCitations) {
+    //             showCitations = true;
+    //             localStorage.setItem('eb-show-citations', '1');
+    //         }
+    //         citationsAutoShown = true;
+    //     }
+
+    //     let resultHTML = `
+    //         <div class="results-card">
+    //             <h2 class="results-title">Результаты теста — ${ticket.id === '?' ? 'Случайные вопросы' : `Билет ${ticket.id}`}</h2>
+    //             <div class="results-stats">
+    //                 <div class="stat correct" data-category="correct"><span class="stat-num">${correctCount}</span> правильно</div>
+    //                 <div class="stat wrong" data-category="wrong"><span class="stat-num">${wrongCount}</span> неправильно</div>
+    //                 <div class="stat unanswered" data-category="unanswered"><span class="stat-num">${unansweredCount}</span> без ответа</div>
+    //             </div>
+    //             <div class="results-actions">
+    //                 <button class="btn btn-accent" id="retryTestBtn">Пройти заново</button>
+    //                 <button class="btn" id="newTicketBtnResult"><i class="fa-solid fa-shuffle"></i> Новый билет</button>
+    //                 <button class="btn" id="randomFromResultsBtn"><i class="fa-solid fa-dice-d6"></i> Случайные вопросы</button>
+    //                 <button class="btn" id="exitTestBtn">Выйти из теста</button>
+    //             </div>
+    //             <div class="results-details">
+    //                 <h3>Детализация:</h3>
+    //                 ${ticket.questions.map((q, i) => {
+    //                     const ans = testAnswers[i];
+    //                     let statusClass = 'unanswered', statusText = 'Нет ответа';
+    //                     if (ans) { statusClass = ans.correct ? 'correct' : 'wrong'; statusText = ans.correct ? 'Правильно' : 'Неправильно'; }
+    //                     return `
+    //                         <div class="result-question" data-status="${statusClass}">
+    //                             <div class="result-status ${statusClass}">${statusText}</div>
+    //                             <div class="result-qtext">${q.text}</div>
+    //                             <ul class="result-options">
+    //                                 ${q.options.map((opt, oi) => {
+    //                                     let cls = '';
+    //                                     let marker = '';
+    //                                     if (opt.correct) {
+    //                                         cls = 'correct';
+    //                                         marker = '✓';
+    //                                     } else if (ans && ans.selected === oi && !ans.correct) {
+    //                                         cls = 'wrong';
+    //                                         marker = '✗';
+    //                                     } else {
+    //                                         // не выбран и не правильный – просто пустой кружок
+    //                                         marker = '';
+    //                                     }
+    //                                     return `<li class="${cls}"><span class="option-marker">${marker}</span> ${opt.text}</li>`;
+    //                                 }).join('')}
+    //                             </ul>
+    //                             ${showCitations && q.citation ? `<div class="citation-block" style="margin-top:0.75rem;"><div class="citation-title">Выдержка из нормативки</div><div class="citation-text">${escapeHTML(q.citation).replace(/\n/g, '<br>')}</div></div>` : ''}
+    //                         </div>
+    //                     `;
+    //                 }).join('')}
+    //             </div>
+    //             <div class="results-actions">
+    //                 <button class="btn btn-accent" id="retryTestBtn-bottom">Пройти заново</button>
+    //                 <button class="btn" id="newTicketBtnResult-bottom"><i class="fa-solid fa-shuffle"></i> Новый билет</button>
+    //                 <button class="btn" id="randomFromResultsBtn-bottom"><i class="fa-solid fa-dice-d6"></i> Случайные вопросы</button>
+    //                 <button class="btn" id="exitTestBtn-bottom">Выйти из теста</button>
+    //             </div>
+    //         </div>
+    //     `;
+    //     testResults.innerHTML = resultHTML;
+    //     // В finishTest(), после вставки innerHTML:
+    //     document.getElementById('retryTestBtn').addEventListener('click', () => startTest(testTicketIndex));
+    //     document.getElementById('retryTestBtn-bottom').addEventListener('click', () => startTest(testTicketIndex));
+
+    //     document.getElementById('newTicketBtnResult').addEventListener('click', () => loadNextRandomTicket());
+    //     document.getElementById('newTicketBtnResult-bottom').addEventListener('click', () => loadNextRandomTicket());
+
+    //     document.getElementById('randomFromResultsBtn').addEventListener('click', () => {
+    //         openRandomModal();
+    //     });
+    //     document.getElementById('randomFromResultsBtn-bottom').addEventListener('click', () => {
+    //         openRandomModal();
+    //     });
+
+    //     document.getElementById('exitTestBtn').addEventListener('click', () => {
+    //         sidebarTestModeToggle.checked = false;
+    //         toggleTestMode(false);
+    //     });
+    //     document.getElementById('exitTestBtn-bottom').addEventListener('click', () => {
+    //         sidebarTestModeToggle.checked = false;
+    //         toggleTestMode(false);
+    //     });
+    //     document.getElementById('retryTestBtn').addEventListener('click', () => startTest(testTicketIndex));
+    //     document.getElementById('newTicketBtnResult').addEventListener('click', () => loadNextRandomTicket());
+    //     document.getElementById('exitTestBtn').addEventListener('click', () => {
+    //         sidebarTestModeToggle.checked = false;
+    //         toggleTestMode(false);
+    //     });
+    //     // интерактивные карточки
+    //     const statElements = document.querySelectorAll('.results-stats .stat');
+    //     const allQuestions = document.querySelectorAll('.result-question');
+    //     statElements.forEach(stat => {
+    //         stat.style.cursor = 'pointer';
+    //         stat.addEventListener('click', function () {
+    //             const category = this.dataset.category;
+    //             const isActive = this.classList.contains('active');
+    //             statElements.forEach(s => s.classList.remove('active'));
+    //             if (isActive) { allQuestions.forEach(q => q.style.display = ''); return; }
+    //             this.classList.add('active');
+    //             allQuestions.forEach(q => q.style.display = q.dataset.status === category ? '' : 'none');
+    //         });
+    //     });
+    //     updateSidebarUI();
+    // }
+
     function finishTest() {
+        if (!testTicketData) return;   // тихо выйти, если тест не запущен
+        // …
+        // if (!testTicketData) {
+        //     console.warn('finishTest вызван без активного теста');
+        //     return;
+        // }
         const ticket = testTicketData;
         const total = ticket.questions.length;
         const correctCount = testAnswers.filter(a => a && a.correct).length;
@@ -572,6 +926,16 @@
             }
             citationsAutoShown = true;
         }
+        // === ПОБЕДНАЯ АНИМАЦИЯ ===
+        if (correctCount === total && wrongCount === 0) {
+            // Проигрываем победную мелодию
+            if (victoryAudio) {
+                victoryAudio.currentTime = 0;
+                victoryAudio.play().catch(e => {});
+            }
+            // Запускаем фейерверк
+            launchFireworks();
+        }
 
         let resultHTML = `
             <div class="results-card">
@@ -582,8 +946,9 @@
                     <div class="stat unanswered" data-category="unanswered"><span class="stat-num">${unansweredCount}</span> без ответа</div>
                 </div>
                 <div class="results-actions">
-                    <button class="btn btn-accent" id="retryTestBtn">Пройти заново</button>
+                    <button class="btn" id="retryTestBtn">Пройти заново</button> <!-- btn-accent-->
                     <button class="btn" id="newTicketBtnResult"><i class="fa-solid fa-shuffle"></i> Новый билет</button>
+                    <button class="btn" id="randomFromResultsBtn"><i class="fa-solid fa-dice-d6"></i> Случайные вопросы</button>
                     <button class="btn" id="exitTestBtn">Выйти из теста</button>
                 </div>
                 <div class="results-details">
@@ -607,7 +972,6 @@
                                             cls = 'wrong';
                                             marker = '✗';
                                         } else {
-                                            // не выбран и не правильный – просто пустой кружок
                                             marker = '';
                                         }
                                         return `<li class="${cls}"><span class="option-marker">${marker}</span> ${opt.text}</li>`;
@@ -619,19 +983,24 @@
                     }).join('')}
                 </div>
                 <div class="results-actions">
-                    <button class="btn btn-accent" id="retryTestBtn-bottom">Пройти заново</button>
+                    <button class="btn" id="retryTestBtn-bottom">Пройти заново</button> <!-- btn-accent-->
                     <button class="btn" id="newTicketBtnResult-bottom"><i class="fa-solid fa-shuffle"></i> Новый билет</button>
+                    <button class="btn" id="randomFromResultsBtn-bottom"><i class="fa-solid fa-dice-d6"></i> Случайные вопросы</button>
                     <button class="btn" id="exitTestBtn-bottom">Выйти из теста</button>
                 </div>
             </div>
         `;
         testResults.innerHTML = resultHTML;
-        // В finishTest(), после вставки innerHTML:
+
+        // ==== ОБРАБОТЧИКИ (только один раз, без дубликатов) ====
         document.getElementById('retryTestBtn').addEventListener('click', () => startTest(testTicketIndex));
         document.getElementById('retryTestBtn-bottom').addEventListener('click', () => startTest(testTicketIndex));
 
         document.getElementById('newTicketBtnResult').addEventListener('click', () => loadNextRandomTicket());
         document.getElementById('newTicketBtnResult-bottom').addEventListener('click', () => loadNextRandomTicket());
+
+        document.getElementById('randomFromResultsBtn').addEventListener('click', openRandomModal);
+        document.getElementById('randomFromResultsBtn-bottom').addEventListener('click', openRandomModal);
 
         document.getElementById('exitTestBtn').addEventListener('click', () => {
             sidebarTestModeToggle.checked = false;
@@ -641,13 +1010,8 @@
             sidebarTestModeToggle.checked = false;
             toggleTestMode(false);
         });
-        document.getElementById('retryTestBtn').addEventListener('click', () => startTest(testTicketIndex));
-        document.getElementById('newTicketBtnResult').addEventListener('click', () => loadNextRandomTicket());
-        document.getElementById('exitTestBtn').addEventListener('click', () => {
-            sidebarTestModeToggle.checked = false;
-            toggleTestMode(false);
-        });
-        // интерактивные карточки
+
+        // Интерактивные карточки статистики
         const statElements = document.querySelectorAll('.results-stats .stat');
         const allQuestions = document.querySelectorAll('.result-question');
         statElements.forEach(stat => {
@@ -669,17 +1033,22 @@
     //     do { newIndex = Math.floor(Math.random() * TICKETS_DATA.length); } while (TICKETS_DATA.length > 1 && newIndex === testTicketIndex);
     //     startTest(newIndex);
     // }
+    // function loadNextRandomTicket() {
+    //     if (TICKETS_DATA.length === 0) return;
+    //     let newIndex;
+    //     if (TICKETS_DATA.length === 1) {
+    //         newIndex = 0; // единственный билет
+    //     } else {
+    //         // Выбираем случайный билет, исключая текущий
+    //         do {
+    //             newIndex = Math.floor(Math.random() * TICKETS_DATA.length);
+    //         } while (newIndex === testTicketIndex);
+    //     }
+    //     startTest(newIndex);
+    // }
     function loadNextRandomTicket() {
         if (TICKETS_DATA.length === 0) return;
-        let newIndex;
-        if (TICKETS_DATA.length === 1) {
-            newIndex = 0; // единственный билет
-        } else {
-            // Выбираем случайный билет, исключая текущий
-            do {
-                newIndex = Math.floor(Math.random() * TICKETS_DATA.length);
-            } while (newIndex === testTicketIndex);
-        }
+        const newIndex = getUnusedRandomTicketIndex();
         startTest(newIndex);
     }
 
@@ -810,6 +1179,11 @@
         localStorage.setItem('eb-sound', soundEnabled ? '1' : '0');
         updateSidebarUI();
     });
+    sidebarSoundSetToggle.addEventListener('change', () => {
+        soundSet = sidebarSoundSetToggle.checked ? 2 : 1;
+        localStorage.setItem('eb-sound-set', soundSet);
+        updateSoundSources();
+    });
     // sidebarShuffleToggle.addEventListener('change', () => {
     //     if (testMode) {
     //         if (isRandomMode) {
@@ -861,6 +1235,11 @@
         }
         updateSidebarUI();
     });
+    sidebarTimerToggle.addEventListener('change', () => {
+        timerOption = sidebarTimerToggle.checked ? 'long' : 'short';
+        localStorage.setItem('eb-timer-option', timerOption);
+        updateSidebarUI();
+    });
 
     // Бургер и оверлей
     burgerBtn.addEventListener('click', () => {
@@ -878,11 +1257,46 @@
     finishTestBtn.addEventListener('click', finishTest);
     finishTestBtnBottom.addEventListener('click', finishTest);
     nextTicketBtn.addEventListener('click', loadNextRandomTicket);
-    randomQuestionsBtn.addEventListener('click', () => {
-        const num = prompt('Сколько вопросов (максимум 50)?', '20');
-        const count = parseInt(num, 10);
-        if (isNaN(count) || count < 1) return;
-        startTest(0, { randomQuestions: true, questionCount: Math.min(count, 50) });
+    // randomQuestionsBtn.addEventListener('click', () => {
+    //     const num = prompt('Сколько вопросов (максимум 50)?', '20');
+    //     const count = parseInt(num, 10);
+    //     if (isNaN(count) || count < 1) return;
+    //     startTest(0, { randomQuestions: true, questionCount: Math.min(count, 50) });
+    // });
+    // Модальное окно случайных вопросов
+    const randomModal = document.getElementById('randomModal');
+    const modalStartBtn = document.getElementById('modalStartBtn');
+    const modalCancelBtn = document.getElementById('modalCancelBtn');
+    const modalCloseBtn = document.getElementById('modalCloseBtn');
+    const randomQuestionCountSelect = document.getElementById('randomQuestionCount');
+
+    function openRandomModal() {
+        randomModal.style.display = 'flex';
+    }
+    function closeRandomModal() {
+        randomModal.style.display = 'none';
+    }
+
+    randomQuestionsBtn.addEventListener('click', openRandomModal);
+    modalCloseBtn.addEventListener('click', closeRandomModal);
+    modalCancelBtn.addEventListener('click', closeRandomModal);
+
+    modalStartBtn.addEventListener('click', () => {
+        const selected = randomQuestionCountSelect.value;
+        let count;
+        if (selected === 'all') {
+            // общее количество вопросов всех билетов
+            count = TICKETS_DATA.reduce((sum, t) => sum + t.questions.length, 0);
+        } else {
+            count = parseInt(selected, 10);
+        }
+        closeRandomModal();
+        startTest(0, { randomQuestions: true, questionCount: count });
+    });
+
+    // Закрытие модалки по клику вне области
+    randomModal.addEventListener('click', (e) => {
+        if (e.target === randomModal) closeRandomModal();
     });
     questionsList.addEventListener('click', handleTestOptionClick);
 
@@ -907,14 +1321,78 @@
         scrollToTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
     }
 
+    // function init() {
+    //     // const savedTheme = localStorage.getItem('eb-theme');
+    //     // if (savedTheme === 'dark') applyTheme(true);
+    //     // else if (savedTheme === 'light') applyTheme(false);
+    //     // else applyTheme(window.matchMedia('(prefers-color-scheme: dark)').matches);
+    //     // correctOnly = localStorage.getItem('eb-correct-only') === '1';
+    //     // showCitations = localStorage.getItem('eb-show-citations') === '1';
+    //     // soundEnabled = localStorage.getItem('eb-sound') === '1';
+    //     correctOnly = localStorage.getItem('eb-correct-only') === '1';
+
+    //     // Выдержки из нормативки: по умолчанию ВКЛ
+    //     if (localStorage.getItem('eb-show-citations') === null) {
+    //         showCitations = true;
+    //         localStorage.setItem('eb-show-citations', '1');
+    //     } else {
+    //         showCitations = localStorage.getItem('eb-show-citations') === '1';
+    //     }
+
+    //     // Звук: по умолчанию ВКЛ
+    //     if (localStorage.getItem('eb-sound') === null) {
+    //         soundEnabled = true;
+    //         localStorage.setItem('eb-sound', '1');
+    //     } else {
+    //         soundEnabled = localStorage.getItem('eb-sound') === '1';
+    //     }
+
+    //     // Перемешивание вопросов: по умолчанию ВКЛ
+    //     if (localStorage.getItem('eb-shuffle') === null) {
+    //         localStorage.setItem('eb-shuffle', '1');
+    //     }
+    //     const shuffleEnabled = localStorage.getItem('eb-shuffle') === '1';
+    //     if (sidebarShuffleToggle) sidebarShuffleToggle.checked = shuffleEnabled;
+
+    //     // Сетка вопросов: по умолчанию ВКЛ
+    //     if (localStorage.getItem('eb-grid') === null) {
+    //         localStorage.setItem('eb-grid', '1');
+    //     }
+    //     const gridEnabled = localStorage.getItem('eb-grid') === '1';
+    //     if (sidebarGridToggle) sidebarGridToggle.checked = gridEnabled;
+
+    //     // Автопереход: по умолчанию ВКЛ
+    //     if (localStorage.getItem('eb-auto-advance') === null) {
+    //         localStorage.setItem('eb-auto-advance', '1');
+    //         autoAdvance = true;
+    //     } else {
+    //         autoAdvance = localStorage.getItem('eb-auto-advance') === '1';
+    //     }
+    //     populateTicketSelect();
+    //     let startIndex = 0;
+    //     const hash = window.location.hash;
+    //     if (hash && hash.startsWith('#ticket-')) {
+    //         const ticketId = parseInt(hash.replace('#ticket-', ''));
+    //         const found = TICKETS_DATA.findIndex(t => t.id === ticketId);
+    //         if (found >= 0) startIndex = found;
+    //     }
+    //     renderTicket(startIndex);
+    //     updateSidebarUI();
+    //     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    //         if (!localStorage.getItem('eb-theme')) applyTheme(e.matches);
+    //     });
+    // }
     function init() {
-        // const savedTheme = localStorage.getItem('eb-theme');
-        // if (savedTheme === 'dark') applyTheme(true);
-        // else if (savedTheme === 'light') applyTheme(false);
-        // else applyTheme(window.matchMedia('(prefers-color-scheme: dark)').matches);
-        // correctOnly = localStorage.getItem('eb-correct-only') === '1';
-        // showCitations = localStorage.getItem('eb-show-citations') === '1';
-        // soundEnabled = localStorage.getItem('eb-sound') === '1';
+        // Загрузка истории неповторения билетов и вопросов
+        loadUsedData();
+
+        // Загрузка настройки таймера билетов
+        const savedTimerOption = localStorage.getItem('eb-timer-option');
+        if (savedTimerOption === 'long') {
+            timerOption = 'long';
+            if (sidebarTimerToggle) sidebarTimerToggle.checked = true;
+        }
+
         correctOnly = localStorage.getItem('eb-correct-only') === '1';
 
         // Выдержки из нормативки: по умолчанию ВКЛ
@@ -954,6 +1432,7 @@
         } else {
             autoAdvance = localStorage.getItem('eb-auto-advance') === '1';
         }
+
         populateTicketSelect();
         let startIndex = 0;
         const hash = window.location.hash;
@@ -967,6 +1446,16 @@
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
             if (!localStorage.getItem('eb-theme')) applyTheme(e.matches);
         });
+        // Восстановление набора звуков
+        const savedSoundSet = localStorage.getItem('eb-sound-set');
+        if (savedSoundSet === '2') {
+            soundSet = 2;
+            if (sidebarSoundSetToggle) sidebarSoundSetToggle.checked = true;
+        } else {
+            soundSet = 1;
+            if (sidebarSoundSetToggle) sidebarSoundSetToggle.checked = false;
+        }
+        updateSoundSources();
     }
     init();
     console.log('⚡ Приложение готово');
