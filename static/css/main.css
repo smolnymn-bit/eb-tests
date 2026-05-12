@@ -1,62 +1,67 @@
+/* ============================================================
+   LIQUID GLASS THEME – iOS 26.4.2 (2026)
+   Полупрозрачность, глубина, динамическая адаптация
+   ============================================================ */
+
 :root {
     --bg: #f0f4ff;
-    --bg-secondary: #f5f7fa;
+    --bg-secondary: rgba(245, 247, 250, 0.5);
     --text: #1a1a2e;
     --text-secondary: #4a5568;
-    --text-sb: #ffffff;
+    --text-sb: #000000d6;
     --accent: #0096d6;
     --accent-hover: #007ab8;
-    --accent-light: #e6f4fb;
-    --card-bg: #ffffff;
-    --card-border: #e2e8f0;
-    --card-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
-    --card-shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.1);
-    --input-bg: #f1f5f9;
-    --input-border: #cbd5e1;
-    --correct-bg: #f0fdf4;
-    --correct-border: #86efac;
+    --accent-light: rgba(0, 150, 214, 0.12);
+    --card-bg: rgba(255, 255, 255, 0.25);
+    --card-border: rgba(255, 255, 255, 0.35);
+    --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08), 0 2px 8px 0 rgba(0, 0, 0, 0.04);
+    --card-shadow-hover: 0 12px 40px 0 rgba(0, 0, 0, 0.12), 0 4px 16px 0 rgba(0, 0, 0, 0.06);
+    --input-bg: rgba(241, 245, 249, 0.5);
+    --input-border: rgba(203, 213, 225, 0.5);
+    --correct-bg: rgba(240, 253, 244, 0.7);
+    --correct-border: rgba(134, 239, 172, 0.8);
     --correct-text: #166534;
-    --tag-bg: #e6f4fb;
+    --tag-bg: rgba(230, 244, 251, 0.7);
     --tag-text: #007ab8;
-    --divider: #e2e8f0;
-    --nav-bg: #ffffff;
-    --badge-bg: #e2e8f0;
+    --divider: rgba(226, 232, 240, 0.5);
+    --nav-bg: rgba(255, 255, 255, 0.2);
+    --badge-bg: rgba(226, 232, 240, 0.6);
     --badge-text: #4a5568;
     --overlay: rgba(255, 255, 255, 0.8);
-    --scrollbar-track: #f1f5f9;
-    --scrollbar-thumb: #cbd5e1;
-    --toggle-bg: #e2e8f0;
+    --scrollbar-track: rgba(241, 245, 249, 0.3);
+    --scrollbar-thumb: rgba(203, 213, 225, 0.6);
+    --toggle-bg: rgba(226, 232, 240, 0.7);
     --toggle-active: #0096d6;
 }
 
 [data-theme="dark"] {
-    /* --bg: #0f172a; */
-    --bg: #02050de6;
-    --bg-secondary: #1e293b;
+    --bg: #0f172a;
+    --bg-secondary: rgba(30, 41, 59, 0.5);
     --text: #e2e8f0;
     --text-secondary: #bed9ff;
-    --accent: #0096d6; /*#38bdf8;*/
+    --text-sb: #f5f5f5e0;
+    --accent: #38bdf8;
     --accent-hover: #7dd3fc;
-    --accent-light: #0c2d48;
-    --card-bg: #1e293b;
-    --card-border: #334155;
-    --card-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
-    --card-shadow-hover: 0 8px 30px rgba(0, 0, 0, 0.4);
-    --input-bg: #1e293b;
-    --input-border: #475569;
-    --correct-bg: #0c2d1a;
-    --correct-border: #22c55e;
+    --accent-light: rgba(56, 189, 248, 0.15);
+    --card-bg: rgba(30, 41, 59, 0.5);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), 0 2px 8px 0 rgba(0, 0, 0, 0.3);
+    --card-shadow-hover: 0 12px 40px 0 rgba(0, 0, 0, 0.7), 0 4px 16px 0 rgba(0, 0, 0, 0.5);
+    --input-bg: rgba(30, 41, 59, 0.6);
+    --input-border: rgba(71, 85, 105, 0.6);
+    --correct-bg: rgba(12, 45, 26, 0.7);
+    --correct-border: rgba(34, 197, 94, 0.7);
     --correct-text: #86efac;
-    --tag-bg: #0c2d48;
+    --tag-bg: rgba(12, 45, 72, 0.7);
     --tag-text: #7dd3fc;
-    --divider: #334155;
-    --nav-bg: #1e293b;
-    --badge-bg: #334155;
+    --divider: rgba(51, 65, 85, 0.6);
+    --nav-bg: rgba(30, 41, 59, 0.4);
+    --badge-bg: rgba(51, 65, 85, 0.6);
     --badge-text: #94a3b8;
     --overlay: rgba(15, 23, 42, 0.85);
-    --scrollbar-track: #1e293b;
-    --scrollbar-thumb: #475569;
-    --toggle-bg: #334155;
+    --scrollbar-track: rgba(30, 41, 59, 0.3);
+    --scrollbar-thumb: rgba(71, 85, 105, 0.6);
+    --toggle-bg: rgba(51, 65, 85, 0.7);
     --toggle-active: #38bdf8;
 }
 
@@ -101,24 +106,21 @@ body {
 
 /* ========== HEADER ========== */
 .header {
-    background: #1e293b73;
-    /* border-right: 1px solid var(--divider); */
-    backdrop-filter: blur(6px) saturate(1.5);
-    /* background: var(--nav-bg); */
-    border-bottom: 1px solid var(--divider);
+    background: var(--nav-bg);
+    backdrop-filter: blur(18px) saturate(180%);
+    -webkit-backdrop-filter: blur(18px) saturate(180%);
+    border-bottom: 1px solid var(--card-border);
     padding: 0 1.5rem;
     min-height: 56px;
     display: flex;
     align-items: center;
-    /* justify-content: space-between; */
     flex-wrap: wrap;
     gap: 0.75rem;
     position: sticky;
     top: 0;
     z-index: 100;
-    /* -webkit-backdrop-filter: blur(12px); */
     transition: all 0.4s ease;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    box-shadow: var(--card-shadow);
 }
 .header-logo {
     display: flex;
@@ -160,7 +162,6 @@ body {
 }
 
 /* ========== BUTTONS & CONTROLS ========== */
-/* Кнопка "Наверх" */
 #scrollToTopBtn {
     position: fixed;
     bottom: 2rem;
@@ -201,9 +202,10 @@ body {
     align-items: center;
     gap: 0.4rem;
     padding: 0.5rem 1rem;
-    border-radius: 8px;
+    border-radius: 30px;
     border: 1px solid var(--card-border);
     background: var(--card-bg);
+    backdrop-filter: blur(10px);
     color: var(--text);
     cursor: pointer;
     font-size: 0.875rem;
@@ -213,9 +215,11 @@ body {
     font-family: inherit;
     text-decoration: none;
     justify-content: center;
+    flex: 1 175px;
+    max-width: 49%;
 }
 .btn:hover {
-    background: var(--bg-secondary);
+    background: rgba(255, 255, 255, 0.3);
     border-color: var(--accent);
     box-shadow: var(--card-shadow);
     transform: translateY(-1px);
@@ -237,7 +241,7 @@ body {
 .btn-sm {
     padding: 0.35rem 0.7rem;
     font-size: 0.8rem;
-    border-radius: 6px;
+    border-radius: 20px;
 }
 
 /* Toggle Switch */
@@ -249,15 +253,20 @@ body {
     color: var(--text-secondary);
     font-weight: 500;
     white-space: nowrap;
-    border: solid 1px;
-    border-color: var(--badge-bg);
-    border-radius: 25px;
-    padding: 8px;
+    border: 1px solid var(--card-border);
+    border-radius: 30px;
+    padding: 8px 14px;
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s;
+}
+.toggle-group:hover {
+    border-color: var(--accent);
 }
 .toggle-switch {
     position: relative;
-    width: 40px;
-    height: 22px;
+    width: 44px;
+    height: 26px;
     flex-shrink: 0;
 }
 .toggle-switch input {
@@ -267,7 +276,7 @@ body {
     height: 100%;
     margin: 0;
     cursor: pointer;
-    z-index: 1;           /* чтобы клики проходили именно по чекбоксу */
+    z-index: 1;
 }
 .toggle-slider {
     position: absolute;
@@ -278,15 +287,15 @@ body {
     bottom: 0;
     background: var(--toggle-bg);
     transition: 0.3s;
-    border-radius: 22px;
+    border-radius: 26px;
 }
 .toggle-slider::before {
     content: '';
     position: absolute;
-    height: 16px;
-    width: 16px;
-    left: 3px;
-    bottom: 3px;
+    height: 22px;
+    width: 22px;
+    left: 2px;
+    bottom: 2px;
     background: #fff;
     transition: 0.3s;
     border-radius: 50%;
@@ -313,9 +322,10 @@ input:checked + .toggle-slider::before {
 .search-input {
     min-width: 300px;
     padding: 0.5rem 1rem 0.5rem 2.8rem;
-    border-radius: 12px;
-    border: 2px solid var(--input-border);
+    border-radius: 30px;
+    border: 1px solid var(--input-border);
     background: var(--input-bg);
+    backdrop-filter: blur(10px);
     color: var(--text);
     font-size: 0.85rem;
     font-family: inherit;
@@ -385,9 +395,10 @@ input:checked + .toggle-slider::before {
 }
 .ticket-select {
     padding: 0.5rem 2rem 0.5rem 0.75rem;
-    border-radius: 8px;
-    border: 2px solid var(--input-border);
+    border-radius: 30px;
+    border: 1px solid var(--input-border);
     background: var(--input-bg);
+    backdrop-filter: blur(10px);
     color: var(--text);
     font-size: 0.9rem;
     font-family: inherit;
@@ -414,9 +425,10 @@ input:checked + .toggle-slider::before {
 .page-btn {
     width: 34px;
     height: 34px;
-    border-radius: 8px;
+    border-radius: 30px;
     border: 1px solid var(--card-border);
     background: var(--card-bg);
+    backdrop-filter: blur(10px);
     color: var(--text);
     cursor: pointer;
     font-weight: 500;
@@ -469,6 +481,7 @@ input:checked + .toggle-slider::before {
     font-weight: 600;
     background: var(--tag-bg);
     color: var(--tag-text);
+    backdrop-filter: blur(6px);
 }
 
 /* ========== QUESTION CARDS ========== */
@@ -479,8 +492,10 @@ input:checked + .toggle-slider::before {
 }
 .question-card {
     background: var(--card-bg);
+    backdrop-filter: blur(18px) saturate(180%);
+    -webkit-backdrop-filter: blur(18px) saturate(180%);
     border: 1px solid var(--card-border);
-    border-radius: 14px;
+    border-radius: 24px;
     padding: 1.25rem 1.5rem;
     transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: var(--card-shadow);
@@ -527,13 +542,14 @@ input:checked + .toggle-slider::before {
 }
 .option-item {
     padding: 0.6rem 0.85rem;
-    border-radius: 8px;
-    border: 1.5px solid var(--card-border);
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
     cursor: default;
     transition: all 0.25s;
     font-size: 0.875rem;
     color: var(--text-secondary);
-    background: var(--bg-secondary);
+    background: var(--card-bg);
+    backdrop-filter: blur(6px);
     position: relative;
     display: flex;
     align-items: flex-start;
@@ -625,8 +641,9 @@ input:checked + .toggle-slider::before {
     left: 0;
     right: 0;
     background: var(--card-bg);
+    backdrop-filter: blur(20px);
     border: 1px solid var(--card-border);
-    border-radius: 0 0 12px 12px;
+    border-radius: 0 0 16px 16px;
     box-shadow: var(--card-shadow-hover);
     z-index: 200;
     max-height: 320px;
@@ -655,8 +672,9 @@ input:checked + .toggle-slider::before {
     gap: 0.5rem;
     margin: 0px 0px 8px 0px;
     padding: 0.75rem 0.5rem;
-    background: var(--bg-secondary);
-    border-radius: 12px;
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    border-radius: 20px;
     flex-wrap: wrap;
 }
 .test-progress {
@@ -665,7 +683,7 @@ input:checked + .toggle-slider::before {
     color: var(--accent);
     min-width: 60px;
     text-align: center;
-    order: -1; /* чтобы прогресс был всегда сверху на мобильных */
+    order: -1;
     width: 100%;
     margin-bottom: 0.25rem;
 }
@@ -681,8 +699,8 @@ input:checked + .toggle-slider::before {
     cursor: default;
 }
 .option-item.wrong {
-    background: #fef2f2;
-    border-color: #fca5a5;
+    background: rgba(255, 59, 48, 0.1);
+    border-color: rgba(255, 59, 48, 0.5);
     color: #991b1b;
 }
 .option-item.wrong .option-marker {
@@ -702,8 +720,9 @@ input:checked + .toggle-slider::before {
 }
 .results-card {
     background: var(--card-bg);
+    backdrop-filter: blur(18px);
     border: 1px solid var(--card-border);
-    border-radius: 14px;
+    border-radius: 24px;
     padding: 2rem;
     box-shadow: var(--card-shadow);
 }
@@ -721,14 +740,18 @@ input:checked + .toggle-slider::before {
     flex-wrap: wrap;
 }
 .stat {
-display: flex;
+    display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0.8rem 0.5rem;
-    border-radius: 12px;
-    background: var(--bg-secondary);
-    width: 120PX;
+    padding: 0.6rem 0.5rem 0.3rem 0.5rem;
+    border-radius: 20px;
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    width: 120px;
     margin-bottom: -10px;
+    border: 1px solid var(--card-border);
+    cursor: pointer;
+    transition: all 0.2s;
 }
 .stat.correct {
     background: var(--correct-bg);
@@ -738,15 +761,15 @@ display: flex;
     transform: translateY(-1px) scale(1.1);
 }
 .stat.wrong {
-    background: #fef2f2;
-    color: #991b1b;
+    background: rgba(255, 59, 48, 0.1);
+    color: #ff3131;
 }
 .stat.wrong:hover {
     transform: translateY(-1px) scale(1.1);
 }
 .stat.unanswered {
-    background: #f8fafc;
-    color: #64748b;
+    background: rgba(248, 250, 252, 0.5);
+    color: #434b57;
 }
 .stat.unanswered:hover {
     transform: translateY(-1px) scale(1.1);
@@ -764,9 +787,11 @@ display: flex;
 }
 .result-question {
     border: 1px solid var(--card-border);
-    border-radius: 10px;
+    border-radius: 16px;
     padding: 1rem;
     margin-bottom: 1rem;
+    background: var(--card-bg);
+    backdrop-filter: blur(8px);
 }
 .result-status {
     display: inline-block;
@@ -781,11 +806,11 @@ display: flex;
     color: var(--correct-text);
 }
 .result-status.wrong {
-    background: #fef2f2;
-    color: #991b1b;
+    background: rgba(255, 59, 48, 0.1);
+    color: #f93c3c;
 }
 .result-status.unanswered {
-    background: #f1f5f9;
+    background: rgba(241, 245, 249, 0.5);
     color: #64748b;
 }
 .result-qtext {
@@ -796,19 +821,10 @@ display: flex;
     list-style: none;
     padding-left: 0;
 }
-/* .result-options li {
-    padding: 0.3rem 0.5rem;
-    border-radius: 6px;
-    margin-bottom: 0.25rem;
-    font-size: 0.9rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-} */
 .result-options li {
     padding: 0.6rem 0.85rem;
-    border-radius: 8px;
-    border: 1.5px solid var(--card-border);
+    border-radius: 10px;
+    border: 1px solid var(--card-border);
     margin-bottom: 0.4rem;
     font-size: 0.9rem;
     display: flex;
@@ -818,15 +834,6 @@ display: flex;
     background: var(--bg-secondary);
     color: var(--text-secondary);
 }
-/* .result-options li.correct {
-    background: var(--correct-bg);
-    color: var(--correct-text);
-    font-weight: 600;
-}
-.result-options li.wrong {
-    background: #fef2f2;
-    color: #991b1b;
-} */
 .result-options li.correct {
     background: var(--correct-bg);
     border-color: var(--correct-border);
@@ -834,21 +841,10 @@ display: flex;
     font-weight: 600;
 }
 .result-options li.wrong {
-    background: #fef2f2;
-    border-color: #fca5a5;
+    background: rgba(255, 59, 48, 0.1);
+    border-color: rgba(255, 59, 48, 0.5);
     color: #991b1b;
 }
-/* .result-options .option-marker {
-    flex-shrink: 0;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.7rem;
-    font-weight: 700;
-} */
 .result-options .option-marker {
     flex-shrink: 0;
     width: 20px;
@@ -872,11 +868,11 @@ display: flex;
     color: white;
 }
 .results-actions {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: 1fr 1fr 1fr;
+    display: flex;
+    gap: 0.4rem;
     margin-top: 2rem;
     justify-content: center;
+    flex-wrap: wrap;
 }
 .green-fa {
     background: #1bc662;
@@ -884,8 +880,71 @@ display: flex;
     padding: 1px 4px;
     border-radius: 50%;
 }
-
-/*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  */
+/* ========== МОДАЛЬНОЕ ОКНО ========== */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+.modal {
+  background: var(--card-bg);
+  backdrop-filter: blur(30px);
+  border-radius: 24px;
+  padding: 1.5rem;
+  min-width: 320px;
+  max-width: 400px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  animation: fadeInUp 0.3s ease;
+  color: var(--text);
+  border: 1px solid var(--card-border);
+}
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.2rem;
+}
+.modal-header h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  line-height: 1;
+}
+.modal-body label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.modal-select {
+  width: 100%;
+  padding: 0.6rem;
+  border-radius: 12px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  backdrop-filter: blur(10px);
+  color: var(--text);
+  font-size: 0.95rem;
+  font-family: inherit;
+  appearance: auto;
+  margin-bottom: 1.2rem;
+}
+.modal-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
 
 /* ========== ТАЙМЕР И ПРОГРЕСС-БАР ========== */
 .test-top-row {
@@ -901,14 +960,13 @@ display: flex;
     color: var(--accent);
     background: var(--accent-light);
     padding: 0rem 0.5rem;
-    border-radius: 6px;
+    border-radius: 8px;
     white-space: nowrap;
 }
 .progress-bar-container {
-    /* flex: 1 1 80px; */
     flex: 0 1 80px;
     height: 8px;
-    background: var(--input-bg);
+    background: rgba(156, 156, 160, 0.2);
     border-radius: 4px;
     overflow: hidden;
     min-width: 60px;
@@ -955,9 +1013,10 @@ button#nextTicketBtn {
 .question-grid-btn {
     width: 34px;
     height: 34px;
-    border-radius: 8px;
+    border-radius: 12px;
     border: 2px solid var(--card-border);
     background: var(--card-bg);
+    backdrop-filter: blur(8px);
     color: var(--text);
     font-size: 0.8rem;
     font-weight: 600;
@@ -980,8 +1039,8 @@ button#nextTicketBtn {
     color: var(--correct-text);
 }
 .question-grid-btn.wrong-answer {
-    background: #fef2f2;
-    border-color: #fca5a5;
+    background: rgba(255, 59, 48, 0.1);
+    border-color: rgba(255, 59, 48, 0.5);
     color: #991b1b;
 }
 .question-grid-btn.unanswered {
@@ -1004,9 +1063,10 @@ div#testControlsBottom {
     padding: 0.75rem 1rem;
     background: var(--bg-secondary);
     border-left: 4px solid var(--accent);
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 0.85rem;
     color: var(--text-secondary);
+    backdrop-filter: blur(6px);
 }
 .citation-title {
     font-weight: 700;
@@ -1021,7 +1081,7 @@ div#testControlsBottom {
 }
 /* Тумблеры в сайдбаре */
 .sidebar-toggle {
-    border: solid 1px var(--toggle-bg);
+    border: 1px solid var(--toggle-bg);
     padding: 8px 16px;
     margin: 4px 0px;
     font-size: 0.85rem;
@@ -1073,15 +1133,16 @@ input:checked + .toggle-slider::before {
     cursor: pointer;
     padding: 0.25rem;
     margin: 0 0 0 auto;
-    display: none;            /* скрыт на десктопах */
+    display: none;
     align-items: center;
 }
 .sidebar {
     min-width: 240px;
     max-width: 240px;
-    background: #1e293b73;
-    border-right: 1px solid var(--divider);
-    backdrop-filter: blur(6px) saturate(1.5);
+    background: var(--nav-bg);
+    backdrop-filter: blur(18px) saturate(180%);
+    -webkit-backdrop-filter: blur(18px) saturate(180%);
+    border-right: 1px solid var(--card-border);
     padding: 1rem 1.5rem;
     transition: left 0.3s ease;
     overflow-y: auto;
@@ -1106,7 +1167,7 @@ input:checked + .toggle-slider::before {
     font-size: 1.5rem;
     cursor: pointer;
     color: var(--text-sb);
-    display: none;            /* видна только на мобильных */
+    display: none;
 }
 .sidebar-item {
     display: flex;
@@ -1114,7 +1175,7 @@ input:checked + .toggle-slider::before {
     gap: 0.75rem;
     padding: 0.6rem 0.8rem;
     margin: 0.2rem 0;
-    border-radius: 8px;
+    border-radius: 12px;
     cursor: pointer;
     transition: background 0.2s;
     font-size: 0.9rem;
@@ -1140,7 +1201,42 @@ input:checked + .toggle-slider::before {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0,0,0,0.3);
+    backdrop-filter: blur(4px);
     z-index: 999;
+}
+
+/* ========== ФЕЙЕРВЕРК ========== */
+#fireworksContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.firework-particle {
+  position: absolute;
+  border-radius: 50%;
+  transform-origin: center center;
+  animation: fireworkBurst 1.5s ease-out forwards; /* было 1.2s */
+}
+
+@keyframes fireworkBurst {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translate(var(--tx), var(--ty)) scale(0.8);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--tx2), var(--ty2)) scale(1.6); /* больше конечный масштаб */
+  }
 }
 
 /* Мобильные */
@@ -1173,21 +1269,18 @@ input:checked + .toggle-slider::before {
         width: 100%;
     }
 }
-/* Удалите или закомментируйте устаревшие .single-btn, если были */
 
-/*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  *//*  */
 @media (max-width: 768px) {
   .header-controls .toggle-group {
-    display: none;   /* спрятать все тумблеры */
+    display: none;
   }
   .header-controls .toggle-group.hidden-placeholder {
     display: none;
   }
   .burger-btn {
-    display: flex;   /* показываем бургер */
+    display: flex;
   }
 }
-/* На мобильных устройствах скрытые тумблеры полностью исчезают, не сохраняя место */
 @media (max-width: 768px) {
     .toggle-group.hidden-placeholder {
         display: none !important;
@@ -1202,7 +1295,7 @@ input:checked + .toggle-slider::before {
     }
     .header-logo {
         font-size: 1rem;
-            margin: 0;
+        margin: 0;
     }
     .header-logo .logo-icon {
         width: 30px;
@@ -1249,7 +1342,7 @@ input:checked + .toggle-slider::before {
     }
     .question-card {
         padding: 1rem;
-        border-radius: 10px;
+        border-radius: 20px;
     }
     .ticket-title {
         font-size: 1.3rem;
@@ -1287,19 +1380,10 @@ input:checked + .toggle-slider::before {
     .ticket-header {
         margin-bottom: 0.5rem;
     }
-    /* Убираем текстовые подписи у тумблеров, оставляем только иконки */
-    /* .toggle-group span {
-        display: none;
-    } */
-    /* Показываем иконки солнца/луны и галочки вместо текста */
     .toggle-group:first-of-type span,
     .toggle-group:nth-of-type(2) span {
-        display: inline; /* оставляем иконки */
+        display: inline;
     }
-    /* скрываем "Учить"/"Тест" полностью, пусть висит только переключатель*/
-    /* .toggle-group:nth-of-type(3) span {
-        display: none; 
-    } */
     .ticket-pagination {
         gap: 0.15rem;
     }
@@ -1318,7 +1402,7 @@ input:checked + .toggle-slider::before {
     .results-card {
         padding: 1.25rem;
     }
-        .test-controls {
+    .test-controls {
         gap: 0.5rem;
         padding: 0.5rem;
         margin: 0px 0px 4px 0px;
@@ -1331,7 +1415,6 @@ input:checked + .toggle-slider::before {
         gap: 0 0.4rem;
     }
     .test-controls .btn {
-        /* flex: 1 1 auto; */
         flex: 1 140px;
         min-width: 0;
         padding: 0.5rem 0.3rem;
@@ -1340,7 +1423,7 @@ input:checked + .toggle-slider::before {
         white-space: nowrap;
     }
     .test-controls .btn i {
-        margin: 0;          /* убираем лишние отступы у иконок */
+        margin: 0;
     }
     .test-progress {
         font-size: 0.8rem;
@@ -1384,5 +1467,5 @@ input:checked + .toggle-slider::before {
     justify-content: center;
 }
 .test-controls.single-btn #nextTicketBtn {
-    flex: 1 1 auto;          /* занимает всю доступную ширину */
+    flex: 1 1 auto;
 }
