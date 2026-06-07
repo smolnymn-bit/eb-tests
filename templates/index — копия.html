@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ЭБ 1256.19. Тесты Ростехнадзора по электробезопасности 3 группа до 1000 В | Подготовка к экзамену</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/favicon.png') }}">
+    <script>
+    // Применяем тему до отрисовки страницы
+    (function() {
+        var theme = localStorage.getItem('eb-theme');
+        if (!theme) theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', theme);
+    })();
+    </script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/fontawesome.all.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <link rel="manifest" href="/static/manifest.json">
+</head>
+<body data-theme="light">
+
+    <!-- ========== HEADER ========== -->
+    <header class="header">
+        <a href="/" class="header-logo" title="На главную">
+            <div class="logo-icon"><i class="fa-solid fa-bolt"></i></div>
+            <span>ЭБ 1256.19. Тесты РТН 3 группа</span>
+        </a>
+        <div class="search-wrapper header-search" id="searchWrapper">
+            <span class="search-icon" id="searchIcon"><i class="fa-solid fa-magnifying-glass"></i></span>
+            <input type="text" class="search-input" id="searchInput"
+                   placeholder="Поиск по всем вопросам и ответам...">
+            <span class="search-results-badge" id="searchBadge"></span>
+            <div class="search-results-dropdown" id="searchDropdown"></div>
+        </div>
+        <!-- User block -->
+        <div class="user-block" id="userBlock">
+            <div class="user-avatar">
+                <i class="fa-solid fa-user"></i>
+            </div>
+            <span class="user-name" id="userNameDisplay">Гость</span>
+        </div>
+        <button id="burgerBtn" class="burger-btn"><i class="fa-solid fa-bars"></i></button>
+    </header>
+
+    <!-- ========== APP LAYOUT ========== -->
+    <div class="app-layout">
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <span>Настройки</span>
+                <button class="sidebar-close-btn" id="sidebarCloseBtn">&times;</button>
+            </div>
+            <div class="sidebar-content">
+                <!-- Тема -->
+                <div class="sidebar-option">
+                    <label class="sidebar-option-label" id="sidebarThemeLabel">Тема</label>
+                    <div class="toggle-group sidebar-toggle">
+                        <span><i class="fa-solid fa-sun"></i></span>
+                        <label class="toggle-switch" title="Переключить тему">
+                            <input type="checkbox" id="sidebarThemeToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span><i class="fa-solid fa-moon"></i></span>
+                    </div>
+                </div>
+                <!-- Тест / Обучение -->
+                <div class="sidebar-option">
+                    <label class="sidebar-option-label" id="sidebarTestModeLabel">Режим обучения</label>
+                    <div class="toggle-group sidebar-toggle">
+                        <span>Учить</span>
+                        <label class="toggle-switch" title="Режим теста">
+                            <input type="checkbox" id="sidebarTestModeToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Тест</span>
+                    </div>
+                </div>
+                <!-- Только верные -->
+                <div class="sidebar-option" id="correctOnlyOption">
+                    <label class="sidebar-option-label">Только верные ответы</label>
+                    <div class="toggle-group sidebar-toggle">
+                        <span>Все</span>
+                        <label class="toggle-switch" title="Показать только правильные ответы">
+                            <input type="checkbox" id="sidebarCorrectOnlyToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span><i class="fa-solid fa-check"></i></span>
+                    </div>
+                </div>
+                <!-- Выдержки -->
+                <div class="sidebar-option" id="citationsOption">
+                    <label class="sidebar-option-label">Выдержки из нормативки</label>
+                    <div class="toggle-group sidebar-toggle">
+                        <span><i class="fa-solid fa-book"></i></span>
+                        <label class="toggle-switch" title="Показать выдержки из нормативки">
+                            <input type="checkbox" id="sidebarCitationsToggle">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span><i class="fa-solid fa-quote-right"></i></span>
+                    </div>
+                </div>
+                <!-- Группа тестовых опций (скрыта в обучении) -->
+                <div id="testOptionsGroup" style="display: none;">
+                    <!-- Режим экзамена -->
+                    <div class="sidebar-option">
+                        <label class="sidebar-option-label">Режим экзамена</label>
+                        <div class="toggle-group sidebar-toggle">
+                            <span><i class="fa-solid fa-graduation-cap"></i></span>
+                            <label class="toggle-switch" title="Режим экзамена (без подсказок)">
+                                <input type="checkbox" id="sidebarExamModeToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span><i class="fa-solid fa-eye-slash"></i></span>
+                        </div>
+                    </div>
+                    <!-- <hr> -->
+                    <!-- Звук -->
+                    <div class="sidebar-option">
+                        <label class="sidebar-option-label">Звук</label>
+                        <div class="toggle-group sidebar-toggle">
+                            <span><i class="fa-solid fa-volume-xmark"></i></span>
+                            <label class="toggle-switch" title="Звук">
+                                <input type="checkbox" id="sidebarSoundToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span><i class="fa-solid fa-volume-high"></i></span>
+                        </div>
+                    </div>
+                    <div class="sidebar-option">
+                        <label class="sidebar-option-label">Мелодия</label>
+                        <div class="toggle-group sidebar-toggle">
+                            <span><i class="fa-brands fa-itunes-note"></i></span>
+                            <label class="toggle-switch" title="Переключить набор звуков">
+                                <input type="checkbox" id="sidebarSoundSetToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span>18+</span>
+                        </div>
+                    </div>
+                    <!-- Перемешать -->
+                    <div class="sidebar-option">
+                        <label class="sidebar-option-label">Перемешать вопросы и ответы</label>
+                        <div class="toggle-group sidebar-toggle">
+                            <span><i class="fa-solid fa-list-ol"></i></span>
+                            <label class="toggle-switch" title="Перемешать">
+                                <input type="checkbox" id="sidebarShuffleToggle" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span><i class="fa-solid fa-shuffle"></i></span>
+                        </div>
+                    </div>
+                    <!-- Сетка -->
+                    <div class="sidebar-option">
+                        <label class="sidebar-option-label">Сетка вопросов</label>
+                        <div class="toggle-group sidebar-toggle">
+                            <span><i class="fa-solid fa-bars"></i></span>
+                            <label class="toggle-switch" title="Сетка вопросов">
+                                <input type="checkbox" id="sidebarGridToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span><i class="fa-solid fa-border-all"></i></span>
+                        </div>
+                    </div>
+                    <!-- Автопереход -->
+                    <div class="sidebar-option">
+                        <label class="sidebar-option-label">Автопереход к следующему вопросу</label>
+                        <div class="toggle-group sidebar-toggle">
+                            <span><i class="fa-solid fa-pause"></i></span>
+                            <label class="toggle-switch" title="Автопереход">
+                                <input type="checkbox" id="sidebarAutoAdvanceToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span><i class="fa-solid fa-forward"></i></span>
+                        </div>
+                    </div>
+                    <!-- Таймер билета -->
+                    <div class="sidebar-option">
+                        <label class="sidebar-option-label">Таймер на билет (10 вопросов)</label>
+                        <div class="toggle-group sidebar-toggle">
+                            <span>10 мин</span>
+                            <label class="toggle-switch" title="Выбор таймера">
+                                <input type="checkbox" id="sidebarTimerToggle">
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span>20 мин</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-item" id="mistakesBtn">
+                    <i class="fa-solid fa-bug"></i> <span>Работа над ошибками</span>
+                </div>
+                <div class="sidebar-item" id="resetStatsBtn">
+                    <i class="fa-solid fa-trash-can"></i> <span>Сбросить статистику</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Оверлей (мобильные) -->
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+        <!-- Основной контент -->
+        <main class="main-container">
+            <!-- Ticket Navigation -->
+            <div class="ticket-nav-div">
+                <div class="ticket-nav">
+                    <span class="nav-label">Билет</span>
+                    <select class="ticket-select" id="ticketSelect"></select>
+                    <div class="ticket-pagination" id="ticketPagination"></div>
+                </div>
+
+                <!-- Ticket Header -->
+                <div class="ticket-header">
+                    <h2 class="ticket-title" id="ticketTitle">Билет 1</h2>
+                    <span class="ticket-badge" id="questionCount">10 вопросов</span>
+                </div>
+            </div>
+            <!-- Верхний блок управления тестом -->
+            <div class="test-controls test-controls-top" id="testControlsTop" style="display: none;">
+                <div class="test-top-row">
+                    <button class="btn btn-sm" id="nextTicketBtn" title="Случайный билет">
+                        <i class="fa-solid fa-shuffle"></i> Случайный билет
+                    </button>
+                    <button class="btn btn-sm" id="randomQuestionsBtn" title="Случайные вопросы из всех билетов">
+                        <i class="fa-solid fa-dice-d6"></i> Случайные вопросы
+                    </button>
+                </div>
+                <div class="test-top-row">    
+                    <div class="test-top-row-time">
+                        <div class="timer-display" id="timerDisplay">20:00</div>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" id="progressFill" style="width:0%"></div>
+                        </div>
+                    </div>
+                    <span class="test-progress" id="questionProgress">1 / 10</span>
+                    <button class="btn btn-sm btn-accent" id="finishTestBtn" style="display:none;">
+                        <i class="fa-solid fa-flag-checkered"></i> Завершить / Результаты
+                    </button>
+                </div>
+            </div>
+
+            <!-- Сетка вопросов -->
+            <div id="questionGrid" class="question-grid" style="display:none;"></div>
+
+            <div id="questionGridPagination" class="grid-pagination" style="display: none;"></div>
+
+            <!-- Questions -->
+            <div class="questions-list" id="questionsList"></div>
+
+            <!-- Нижний блок управления тестом -->
+            <div class="test-controls test-controls-bottom" id="testControlsBottom" style="display: none;">
+                <button class="btn btn-sm" id="prevQuestionBtn">
+                    <i class="fa-solid fa-chevron-left"></i> Предыдущий вопрос
+                </button>
+                <button class="btn btn-sm" id="nextQuestionBtn">
+                    Следующий вопрос <i class="fa-solid fa-chevron-right"></i>
+                </button>
+                <button class="btn btn-sm btn-accent" id="finishTestBtnBottom" style="display:none;">
+                    <i class="fa-solid fa-flag-checkered"></i> Завершить / Результаты
+                </button>
+            </div>
+
+            <!-- Результаты теста -->
+            <div class="test-results" id="testResults" style="display: none;"></div>
+
+            <!-- Empty state for search -->
+            <div class="empty-state" id="emptyState" style="display:none;">
+                <div class="empty-icon">📭</div>
+                <p>Ничего не найдено</p>
+                <small>Попробуйте изменить поисковый запрос</small>
+            </div>
+            <!-- Модальное окно случайных вопросов -->
+            <div class="modal-overlay" id="randomModal" style="display:none;">
+            <div class="modal">
+                <div class="modal-header">
+                <h3>Случайные вопросы</h3>
+                <button class="modal-close-btn" id="modalCloseBtn">&times;</button>
+                </div>
+                <div class="modal-body">
+                <label for="randomQuestionCount">Количество вопросов:</label>
+                <select id="randomQuestionCount" class="modal-select">
+                    <option value="10">10</option>
+                    <option value="20" selected>20</option>
+                    <option value="30">30</option>
+                    <option value="40">40</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="all">Все</option>
+                </select>
+                <div class="modal-actions">
+                    <button class="btn btn-accent" id="modalStartBtn">Начать тест</button>
+                    <button class="btn" id="modalCancelBtn">Отмена</button>
+                </div>
+                </div>
+            </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Кнопка "Наверх" -->
+    <button id="scrollToTopBtn" title="Наверх">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <!-- Аудио -->
+     <!-- Контейнер для анимации фейерверка -->
+    <div id="fireworksContainer"></div>
+    <script>
+        // Наборы звуков. В каждый массив можно добавлять сколько угодно файлов.
+        window.SOUND_SETS = {
+            1: {   // обычный режим (тумблер "18+" выключен)
+                correct: [
+                    "/static/sounds/correct_1.mp3" // можно добавить ещё
+                ],
+                wrong: [
+                    "/static/sounds/wrong_1.mp3" // можно добавить ещё
+                ],
+                victory: [
+                    "/static/sounds/victory_1.mp3"
+                ],
+                testWrong: [
+                    "/static/sounds/test_wrong_1.mp3",
+                    "/static/sounds/test_wrong_2.mp3",
+                    "/static/sounds/test_wrong_3.mp3",
+                    "/static/sounds/test_wrong_4.mp3",
+                    "/static/sounds/test_wrong_5.mp3"
+                ]
+            },
+            2: {   // режим "18+" (тумблер включён)
+                correct: [
+                    "/static/sounds/correct_18_1.mp3",
+                    "/static/sounds/correct_18_2.mp3",
+                    "/static/sounds/correct_18_3.mp3"
+                ],
+                wrong: [
+                    "/static/sounds/wrong_18_1.mp3",
+                    "/static/sounds/wrong_18_2.mp3",
+                    "/static/sounds/wrong_18_3.mp3",
+                    "/static/sounds/wrong_18_4.mp3",
+                    "/static/sounds/wrong_18_5.mp3"
+                ],
+                victory: [
+                    "/static/sounds/victory_18_1.mp3",
+                    "/static/sounds/victory_18_2.mp3",
+                    "/static/sounds/victory_18_3.mp3"
+                ],
+                testWrong: [
+                    "/static/sounds/test_wrong_18_1.mp3",
+                    "/static/sounds/test_wrong_18_2.mp3",
+                    "/static/sounds/test_wrong_18_3.mp3",
+                    "/static/sounds/test_wrong_18_4.mp3",
+                    "/static/sounds/test_wrong_18_5.mp3"
+                ]
+            }
+        };
+    </script>
+    <script>
+        // Передача данных из Flask в JavaScript
+        window.TICKETS_DATA = {{ tickets_json|safe }};
+    </script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
+          .then(r => console.log('SW зарегистрирован:', r.scope))
+          .catch(e => console.error('Ошибка SW:', e));
+      }
+    </script>
+    <script>
+        (function() {
+            const header = document.querySelector('.header');
+            if (!header) return;
+            let lastScrollY = window.scrollY;
+            let ticking = false;
+            const isMobile = () => window.innerWidth < 1140;
+            function update() {
+                if (!isMobile()) { header.classList.remove('header-hidden'); return; }
+                const current = window.scrollY;
+                if (current > 100 && current > lastScrollY) header.classList.add('header-hidden');
+                else if (current < lastScrollY || current <= 100) header.classList.remove('header-hidden');
+                lastScrollY = current;
+                ticking = false;
+            }
+            window.addEventListener('scroll', () => { if (!ticking && isMobile()) { requestAnimationFrame(update); ticking = true; } });
+            window.addEventListener('resize', () => { if (!isMobile()) header.classList.remove('header-hidden'); else update(); });
+            update();
+        })();
+    </script>    
+</body>
+</html>

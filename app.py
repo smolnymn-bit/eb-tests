@@ -20,12 +20,14 @@ def load_raw_text(filepath: Path) -> str:
 # Загружаем текст при старте
 RAW_TEXT = load_raw_text(TICKETS_FILE)
 
-# ========== ПАРСИНГ (тот же самый, что и раньше) ==========
+# ========== ПАРСИНГ ==========
 def parse_tickets(raw_text: str) -> list:
     """Парсит текст со всеми билетами и возвращает список словарей."""
     tickets = []
-    ticket_blocks = re.split(r'\n(?=БИЛЕТ\s+\d+|Билет\s+\d+)', raw_text.strip())
+    citations_found = 0
+    missing_citations = []
 
+    ticket_blocks = re.split(r'\n(?=БИЛЕТ\s+\d+|Билет\s+\d+)', raw_text.strip())
     for block in ticket_blocks:
         if not block.strip():
             continue
@@ -45,45 +47,6 @@ def parse_tickets(raw_text: str) -> list:
             if not q_block:
                 continue
 
-            # lines = q_block.split('\n')
-            # first_line = lines[0].strip()
-            # q_text = re.sub(r'^\d+\.\s*', '', first_line).strip()
-
-            # options = []
-            # for line in lines[1:]:
-            #     line = line.strip()
-            #     if not line:
-            #         continue
-            #     # option_match = re.match(r'^[-•]\s*(✅?\s*)\[?\s*\]?\s*(.*)', line)
-            #     option_match = re.match(r'\s*[-•]\s*(✅?\s*)\[?\s*\]?\s*(.*)', line)
-            #     if option_match:
-            #         marker = option_match.group(1).strip()
-            #         text = option_match.group(2).strip()
-            #         is_correct = '✅' in marker or '✅' in line[:5]
-            #         options.append({
-            #             "text": text,
-            #             "correct": is_correct
-            #         })
-
-            # # Ищем выдержку из нормативки после вариантов ответа
-            # citation = None
-            # for i, line in enumerate(lines):
-            #     if line.strip().lower().startswith('выдержка из нормативки'):
-            #         cite_lines = [l.strip() for l in lines[i+1:] if l.strip()]
-            #         if cite_lines:
-            #             citation = '\n'.join(cite_lines)
-            #         break
-            # if citation:
-            #     print(f"✅ Найдена выдержка для вопроса: {q_text[:60]}...")
-            # else:
-            #     print(f"❌ Нет выдержки для вопроса: {q_text[:60]}...")
-
-            # if q_text and options:
-            #     questions.append({
-            #         "text": q_text,
-            #         "options": options,
-            #         "citation": citation
-            #     })
             lines = q_block.split('\n')
             first_line = lines[0].strip()
             q_text = re.sub(r'^\d+\.\s*', '', first_line).strip()
@@ -101,7 +64,7 @@ def parse_tickets(raw_text: str) -> list:
                 # Как только встретили выдержку – всё остальное до конца блока идёт в цитату
                 if line.lower().startswith('выдержка из нормативки'):
                     found_citation = True
-                    continue
+                    continue 
 
                 if found_citation:
                     cite_lines.append(line)
@@ -122,10 +85,11 @@ def parse_tickets(raw_text: str) -> list:
             if found_citation and cite_lines:
                 citation = '\n'.join(cite_lines)
 
+            # Собираем статистику вместо вывода в консоль
             if citation:
-                print(f"✅ Найдена выдержка для вопроса: {q_text[:60]}...")
+                citations_found += 1
             else:
-                print(f"❌ Нет выдержки для вопроса: {q_text[:60]}...")
+                missing_citations.append(q_text)
 
             if q_text and options:
                 questions.append({
@@ -141,6 +105,13 @@ def parse_tickets(raw_text: str) -> list:
             })
 
     tickets.sort(key=lambda t: t['id'])
+
+    # ========== ИТОГОВЫЕ ЛОГИ ==========
+    print(f"✅ Найдены выдержки для {citations_found} вопросов")
+    if missing_citations:
+        missing_str = ", ".join(missing_citations)
+        print(f"❌ Нет выдержки для {len(missing_citations)} вопросов: {missing_str}")
+
     return tickets
 
 TICKETS = parse_tickets(RAW_TEXT)
